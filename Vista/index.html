@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OLC2 - PROYECTO1</title>
+    <link rel="stylesheet" href="estilo.css">
+    <link icon="image/png" href="https://static.vecteezy.com/system/resources/previews/016/017/020/original/transparent-coding-development-icon-free-png.png" rel="icon">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="title">
+                <h1>OakLand - Proyecto 1</h1>
+            </div>
+            <div class="nav-section">
+                <div class="nav-button">
+                    <button id="analizaEntrada">Analizar</button>
+                </div>
+                <div class="nav-item">
+                    <h2>Archivo</h2>
+                    <div class="dropdown-content">
+                        <button id="AbrirArchivo">Abrir Archivo</button>
+                        <button id="CrearArchivo">Crear Archivo</button>
+                        <button id="GuardarArchivo">Guardar Archivo</button>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <h2>Reportes</h2>
+                    <div class="dropdown-content">
+                        <button id="">Errores</button>
+                        <button id="">Tabla de Símbolos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="file" id="fileInput" style="display: none;" accept=".oak"> 
+        <div class="container-consola">
+            <div class="line-numbers" id="lnEntrada"></div>
+            <textarea id="txtAreaEntrada" placeholder="Entrada"></textarea>
+        </div>
+        <div class="container-consola">
+            <div class="line-numbers" id="lnSalida"></div>
+            <textarea id="txtAreaSalida" readonly placeholder="Salida"></textarea>
+        </div>
+    </div>
+    <script type="module" src="index.js"></script>
+</body>
+</html>
