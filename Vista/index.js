@@ -1,7 +1,7 @@
-/*let UltimoAST = null;
-import { Parser } from '../Interprete/Analizador/Parser.js';
-import { Interprete } from '../Interprete/Analizador/Interprete.js';
-*/
+let UltimoAST = null;
+import { parse } from '../Interprete/Analizador/Parser.js';
+import { Interprete } from '../Interprete/Analizador/InterpreteV.js';
+
 export function FuncionArchivo() {
     const entrada = document.getElementById('txtAreaEntrada');
     const salida = document.getElementById('txtAreaSalida');
@@ -104,7 +104,7 @@ export function FuncionInterprete() {
     function ejecutarCodigo() {
         const codigo = entrada.value;
         try {
-            const sentencias = Parser(codigo);
+            const sentencias = parse(codigo);
             const interprete = new Interprete();
             console.log({ sentencias });
             sentencias.forEach(sentencia => sentencia.accept(interprete));
