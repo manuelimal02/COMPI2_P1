@@ -17,6 +17,9 @@ export class DeclaracionVariableHandler {
     EjecutarHandler() {
         let valor;
         let tipoInferido = this.tipo;
+        if (this.tipo === 'var' && !this.expresion) {
+            throw new Error(`La variable "${this.nombre}" de tipo 'var' debe tener una expresión para inferir su tipo.`);
+        }
         if (this.expresion) {
             valor = this.expresion.accept(this.visitor);
             if (this.tipo === 'var') {
@@ -36,7 +39,7 @@ export class DeclaracionVariableHandler {
         } else if (typeof valor === 'boolean') {
             return 'bool';
         } else {
-            throw new Error(`No se puede determinar el tipo de la variable "${this.nombre}".`);
+            throw new Error(`No Se Puede Determinar El Tipo De Dato De: "${this.nombre}".`);
         }
     }
 
@@ -48,7 +51,7 @@ export class DeclaracionVariableHandler {
             case 'bool': return true;
             case 'char': return '\0';
             case 'var': return null;
-            default: throw new Error(`Tipo de variable "${tipo}" no válido.`);
+            default: throw new Error(`Tipo De Variable: "${tipo}" No Válido.`);
         }
     }
 
@@ -58,16 +61,16 @@ export class DeclaracionVariableHandler {
             entorno.setVariable(tipoInferido, this.nombre, valor);
         } else if (tipoInferido === 'float' && typeof valor === 'number') {
             entorno.setVariable(tipoInferido, this.nombre, valor);
+        }else if (tipoInferido === 'char' && typeof valor === 'string' && valor.length === 1) {
+                entorno.setVariable(tipoInferido, this.nombre, valor);
         } else if (tipoInferido === 'string' && typeof valor === 'string') {
             entorno.setVariable(tipoInferido, this.nombre, valor);
         } else if (tipoInferido === 'bool' && typeof valor === 'boolean') {
             entorno.setVariable(tipoInferido, this.nombre, valor);
-        } else if (tipoInferido === 'char' && typeof valor === 'string' && valor.length === 1) {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
         } else if (tipoInferido === 'var') {
             entorno.setVariable(tipoInferido, this.nombre, valor);
         } else {
-            throw new Error(`La variable "${this.nombre}" debe ser de tipo ${tipoInferido}.`);
+            throw new Error(`La Variable: "${this.nombre}" Debe Ser Tipo: "${tipoInferido}".`);
         }
     }
 }

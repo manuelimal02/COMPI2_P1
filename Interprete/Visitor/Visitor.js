@@ -13,7 +13,10 @@
  * @typedef {import('../Nodo/Nodos.js').Agrupacion} Agrupacion
 
 
- * @typedef {import('../Nodo/Nodos.js').Numero} Numero
+ * @typedef {import('../Nodo/Nodos.js').Entero} Entero
+
+
+ * @typedef {import('../Nodo/Nodos.js').Decimal} Decimal
 
 
  * @typedef {import('../Nodo/Nodos.js').Cadena} Cadena
@@ -95,11 +98,20 @@ export class BaseVisitor {
     
 
     /**
-     * @param {Numero} node
+     * @param {Entero} node
      * @returns {any}
      */
-    visitNumero(node) {
-        throw new Error('Metodo visitNumero no implementado');
+    visitEntero(node) {
+        throw new Error('Metodo visitEntero no implementado');
+    }
+    
+
+    /**
+     * @param {Decimal} node
+     * @returns {any}
+     */
+    visitDecimal(node) {
+        throw new Error('Metodo visitDecimal no implementado');
     }
     
 

@@ -45,32 +45,32 @@ export class OperacionBinaria extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion} options.izq Expresion izquierda de la operacion
- * @param {Expresion} options.der Expresion derecha de la operacion
- * @param {string} options.op Operador de la operacion
+    * @param {Expresion} options.izquierda Expresion izquierda de la operacion
+ * @param {Expresion} options.derecha Expresion derecha de la operacion
+ * @param {string} options.operador Operador de la operacion
     */
-    constructor({ izq, der, op }) {
+    constructor({ izquierda, derecha, operador }) {
         super();
         
         /**
          * Expresion izquierda de la operacion
          * @type {Expresion}
         */
-        this.izq = izq;
+        this.izquierda = izquierda;
 
 
         /**
          * Expresion derecha de la operacion
          * @type {Expresion}
         */
-        this.der = der;
+        this.derecha = derecha;
 
 
         /**
          * Operador de la operacion
          * @type {string}
         */
-        this.op = op;
+        this.operador = operador;
 
     }
 
@@ -140,18 +140,18 @@ export class Agrupacion extends Expresion {
     }
 }
     
-export class Numero extends Expresion {
+export class Entero extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {number} options.valor Valor del numero
+    * @param {int} options.valor Valor del entero
     */
     constructor({ valor }) {
         super();
         
         /**
-         * Valor del numero
-         * @type {number}
+         * Valor del entero
+         * @type {int}
         */
         this.valor = valor;
 
@@ -161,7 +161,32 @@ export class Numero extends Expresion {
      * @param {BaseVisitor} visitor
      */
     accept(visitor) {
-        return visitor.visitNumero(this);
+        return visitor.visitEntero(this);
+    }
+}
+    
+export class Decimal extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {float} options.valor Valor del float
+    */
+    constructor({ valor }) {
+        super();
+        
+        /**
+         * Valor del float
+         * @type {float}
+        */
+        this.valor = valor;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDecimal(this);
     }
 }
     
@@ -361,9 +386,9 @@ export class Asignacion extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.id Identificador de la variable
- * @param {Expresion} options.asgn Expresion a asignar
+ * @param {Expresion} options.asignacion Expresion a asignar
     */
-    constructor({ id, asgn }) {
+    constructor({ id, asignacion }) {
         super();
         
         /**
@@ -377,7 +402,7 @@ export class Asignacion extends Expresion {
          * Expresion a asignar
          * @type {Expresion}
         */
-        this.asgn = asgn;
+        this.asignacion = asignacion;
 
     }
 
@@ -393,16 +418,16 @@ export class Bloque extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion[]} options.dcls Sentencias del bloque
+    * @param {Expresion[]} options.sentencias Sentencias del bloque
     */
-    constructor({ dcls }) {
+    constructor({ sentencias }) {
         super();
         
         /**
          * Sentencias del bloque
          * @type {Expresion[]}
         */
-        this.dcls = dcls;
+        this.sentencias = sentencias;
 
     }
 
@@ -488,4 +513,4 @@ export class While extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Numero, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While }
