@@ -7,13 +7,12 @@
         'caracter': Nodos.Caracter,	
         'booleano': Nodos.Booleano,
         'Agrupacion': Nodos.Agrupacion,
-        'unaria': Nodos.OperacionUnaria,
         'DeclaracionVar': Nodos.DeclaracionVar,
         'ReferenciaVariable': Nodos.ReferenciaVariable,
         'OperacionBinaria': Nodos.OperacionBinaria,
         'OperacionUnaria': Nodos.OperacionUnaria,
         'Print': Nodos.Print,
-        'sentencia': Nodos.ExpresionStmt,
+        'ternario': Nodos.Ternario,
         'asignacion': Nodos.Asignacion,
         'Bloque': Nodos.Bloque,
         'If': Nodos.If,
@@ -38,12 +37,20 @@ DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             / tipo:TIPO _ id:IDENTIFICADOR _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
 
-SENTENCIA =  print_s:PRINT
+SENTENCIA =  if_1:IF
+            {return if_1}
+            / print_s:PRINT
             {return print_s}
             /bloque:BLOQUE
             {return bloque}
             /asignacion:ASIGNACION
             {return asignacion}
+
+IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
+            sentenciasFalso:(
+            _ "else" _ sentenciasFalso:SENTENCIA 
+            { return sentenciasFalso } )? 
+            { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
 
 PRINT = "print(" _ expresion:EXPRESION _ ")" _ ";" _
             {return NuevoNodo('Print', { expresion })}
@@ -71,8 +78,10 @@ EXPRESION =  ternario:TERNARIO
             / cadena:CADENA
             {return cadena}
 
-TERNARIO =  condicion:LOGICO _ "?" _ expTrue:LOGICO _ ":"_ expFalse:LOGICO _ 
-            { return NuevoNodo('ternario', {condicion, expTrue, expFalse }) }
+Typeof = "typeof" _ exp:EXPRESION _ {return crearHoja('tipoOf', {exp})}
+
+TERNARIO =  condicion:LOGICO _ "?" _ verdadero:LOGICO _ ":"_ falso:LOGICO _ 
+            { return NuevoNodo('ternario', {condicion, verdadero, falso }) }
             / LOGICO
 
 LOGICO = OR
@@ -141,8 +150,13 @@ MULTIPLICACION = izquierda:UNARIA expansion:( _ operador:("*" / "/" / "%") _ der
         izquierda
     )
 }
-UNARIA = "-" _ datos:OTRAEXPRESION {return NuevoNodo('OperacionUnaria', {operador: '-', datos: datos})}
+UNARIA = "-" _ expresion:OTRAEXPRESION {return NuevoNodo('OperacionUnaria', {operador: '-', expresion: expresion})}
         / OTRAEXPRESION
+
+INCDEC= _ expresion:OTRAEXPRESION _ "++"
+            { return NuevoNodo('OperacionUnaria', { operador: '++', expresion: expresion }) }
+            / _ expresion:OTRAEXPRESION _ "--"
+            { return NuevoNodo('OperacionUnaria', { operador: '--', expresion: expresion }) }
 
 OTRAEXPRESION = decimal:DECIMAL
             {return decimal}
@@ -164,8 +178,8 @@ TIPO = "int"
             {return text()}    
             / "string" 
             {return text()}
-            / "bool" 
-            {return text()}
+            / "boolean" 
+            {return "bool"}
             / "char" 
             {return text()}
             / "var"

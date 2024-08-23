@@ -37,7 +37,7 @@
  * @typedef {import('../Nodo/Nodos.js').Print} Print
 
 
- * @typedef {import('../Nodo/Nodos.js').ExpresionStmt} ExpresionStmt
+ * @typedef {import('../Nodo/Nodos.js').Ternario} Ternario
 
 
  * @typedef {import('../Nodo/Nodos.js').Asignacion} Asignacion
@@ -170,11 +170,11 @@ export class BaseVisitor {
     
 
     /**
-     * @param {ExpresionStmt} node
+     * @param {Ternario} node
      * @returns {any}
      */
-    visitExpresionStmt(node) {
-        throw new Error('Metodo visitExpresionStmt no implementado');
+    visitTernario(node) {
+        throw new Error('Metodo visitTernario no implementado');
     }
     
 

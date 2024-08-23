@@ -87,9 +87,9 @@ export class OperacionUnaria extends Expresion {
     /**
     * @param {Object} options
     * @param {Expresion} options.expresion Expresion de la operacion
- * @param {string} options.op Operador de la operacion
+ * @param {string} options.operador Operador de la operacion
     */
-    constructor({ expresion, op }) {
+    constructor({ expresion, operador }) {
         super();
         
         /**
@@ -103,7 +103,7 @@ export class OperacionUnaria extends Expresion {
          * Operador de la operacion
          * @type {string}
         */
-        this.op = op;
+        this.operador = operador;
 
     }
 
@@ -356,20 +356,36 @@ export class Print extends Expresion {
     }
 }
     
-export class ExpresionStmt extends Expresion {
+export class Ternario extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion} options.expresion Expresion a evaluar
+    * @param {Expresion} options.condicion Condicion a evaluar
+ * @param {Expresion} options.verdadero Si la condicion es  verdadera
+ * @param {Expresion} options.falso Si la condicion es falsa
     */
-    constructor({ expresion }) {
+    constructor({ condicion, verdadero, falso }) {
         super();
         
         /**
-         * Expresion a evaluar
+         * Condicion a evaluar
          * @type {Expresion}
         */
-        this.expresion = expresion;
+        this.condicion = condicion;
+
+
+        /**
+         * Si la condicion es  verdadera
+         * @type {Expresion}
+        */
+        this.verdadero = verdadero;
+
+
+        /**
+         * Si la condicion es falsa
+         * @type {Expresion}
+        */
+        this.falso = falso;
 
     }
 
@@ -377,7 +393,7 @@ export class ExpresionStmt extends Expresion {
      * @param {BaseVisitor} visitor
      */
     accept(visitor) {
-        return visitor.visitExpresionStmt(this);
+        return visitor.visitTernario(this);
     }
 }
     
@@ -443,32 +459,32 @@ export class If extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion} options.cond Condicion del if
- * @param {Expresion} options.stmtTrue Cuerpo del if
- * @param {Expresion|undefined} options.stmtFalse Cuerpo del else
+    * @param {Expresion} options.condicion Condicion del if
+ * @param {Expresion} options.sentenciasVerdadero Cuerpo del if
+ * @param {Expresion|undefined} options.sentenciasFalso Cuerpo del else
     */
-    constructor({ cond, stmtTrue, stmtFalse }) {
+    constructor({ condicion, sentenciasVerdadero, sentenciasFalso }) {
         super();
         
         /**
          * Condicion del if
          * @type {Expresion}
         */
-        this.cond = cond;
+        this.condicion = condicion;
 
 
         /**
          * Cuerpo del if
          * @type {Expresion}
         */
-        this.stmtTrue = stmtTrue;
+        this.sentenciasVerdadero = sentenciasVerdadero;
 
 
         /**
          * Cuerpo del else
          * @type {Expresion|undefined}
         */
-        this.stmtFalse = stmtFalse;
+        this.sentenciasFalso = sentenciasFalso;
 
     }
 
@@ -513,4 +529,4 @@ export class While extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, ExpresionStmt, Asignacion, Bloque, If, While }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While }

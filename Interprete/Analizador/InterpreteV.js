@@ -2,6 +2,7 @@ import { Entorno } from "../Entorno/Entorno.js";
 import { BaseVisitor } from "../Visitor/Visitor.js";
 import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
 import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
+import { TernarioHandler } from "../Instruccion/Ternario.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -29,6 +30,17 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionUnaria']}
     */
     visitOperacionUnaria(node) {
+        const expresion = node.expresion.accept(this);
+        switch (node.op) {
+            case '-':
+                return -expresion;
+            case '++':
+                return expresion + 1;
+            case '--':
+                return expresion - 1;
+            default:
+                throw new Error(`Operador no soportado: ${node.op}`);
+        }
     }
 
     /**
@@ -99,10 +111,11 @@ export class Interprete extends BaseVisitor {
     }
 
     /**
-    * @type {BaseVisitor['visitExpresionStmt']}
+    * @type {BaseVisitor['visitTernario']}
     */
-    visitExpresionStmt(node) {
-        node.expresion.accept(this);
+    visitTernario(node) {
+        const TernarioHandler1 = new TernarioHandler(node.condicion, node.verdadero, node.falso, this);
+        return TernarioHandler1.EjecutarHandler();
     }
 
     /**
@@ -129,6 +142,14 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitIf']}
     */
     visitIf(node) {
+        const condicion = node.condicion.accept(this);
+        if (condicion) {
+            node.sentenciasVerdadero.accept(this);
+            return;
+        }
+        if (node.sentenciasFalso) {
+            node.sentenciasFalso.accept(this);
+        }
     }
 
     /**

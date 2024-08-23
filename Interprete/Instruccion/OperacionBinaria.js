@@ -15,12 +15,12 @@ export class OperacionBinariaHandler {
         switch (this.operador) {
             case '+':
                 return this.validarSuma();
+            case '-':
+                return this.validarResta();
             case '+=': 
                 return this.validarSumaImplicita();
             case '-=': 
                 return this.validarRestaImplicita();
-            case '-':
-                return this.validarResta();
             case '*':
                 return this.validarMultiplicacion();
             case '/':
@@ -79,8 +79,6 @@ export class OperacionBinariaHandler {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
         }
     }
-    
-    
 
     validarSuma() {
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
