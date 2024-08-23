@@ -3,6 +3,7 @@ import { BaseVisitor } from "../Visitor/Visitor.js";
 import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
 import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
+import { IfHandler } from "../Instruccion/SentenciaIF.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -142,14 +143,8 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitIf']}
     */
     visitIf(node) {
-        const condicion = node.condicion.accept(this);
-        if (condicion) {
-            node.sentenciasVerdadero.accept(this);
-            return;
-        }
-        if (node.sentenciasFalso) {
-            node.sentenciasFalso.accept(this);
-        }
+        const IfHandler1 = new IfHandler(node.condicion, node.sentenciasVerdadero, node.sentenciasFalso, this);
+        IfHandler1.EjecutarHandler();
     }
 
     /**
