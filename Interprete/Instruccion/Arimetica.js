@@ -1,4 +1,4 @@
-export class AritmeticaHandler {
+export class OperacionBinariaHandler {
     /**
      * @param {string} operador
      * @param {any} izquierda
@@ -23,6 +23,10 @@ export class AritmeticaHandler {
                 return this.validarDivision();
             case '%':
                 return this.validarModulo();
+            case '==':
+                return this.validarIgualdad();
+            case '!=':  
+                return this.validarDesigualdad();
             default:
                 throw new Error(`Operador No Reconocido: ${this.operador}`);
         }
@@ -70,12 +74,13 @@ export class AritmeticaHandler {
         if (this.derecha === 0) {
             throw new Error("Advertencia: División por cero. Resultado será null.");
         }
-
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
+            console.log(this.izquierda);
+            console.log(this.derecha);
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(Math.floor(this.izquierda / this.derecha));  // int / int = int
+                return parseInt(this.izquierda / this.derecha);  // int / int = int
             } else {
-                return parseFloat(this.izquierda / this.derecha);  // float / float = float, int / float = float
+                return this.izquierda / this.derecha;  // float / float = float, int / float = float
             }
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
@@ -94,6 +99,32 @@ export class AritmeticaHandler {
             }
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+    }
+
+    validarIgualdad() {
+        if (typeof this.izquierda !== typeof this.derecha) {
+            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
+            return this.izquierda === this.derecha;
+        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
+            return this.izquierda.localeCompare(this.derecha) === 0;
+        } else {
+            return this.izquierda === this.derecha;
+        }
+    }
+
+    validarDesigualdad() {
+        if (typeof this.izquierda !== typeof this.derecha) {
+            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
+            return this.izquierda !== this.derecha;
+        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
+            return this.izquierda.localeCompare(this.derecha) !== 0;
+        } else {
+            return this.izquierda !== this.derecha;
         }
     }
 }

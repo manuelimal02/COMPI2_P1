@@ -7,7 +7,6 @@
         'caracter': Nodos.Caracter,	
         'booleano': Nodos.Booleano,
         'Agrupacion': Nodos.Agrupacion,
-        'binaria': Nodos.OperacionBinaria,
         'unaria': Nodos.OperacionUnaria,
         'DeclaracionVar': Nodos.DeclaracionVar,
         'ReferenciaVariable': Nodos.ReferenciaVariable,
@@ -57,8 +56,8 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
 
 EXPRESION =  booleano:BOOLEANO
             {return booleano}
-            /aritmetica:ARITMETICA
-            {return aritmetica}
+            / ternario:TERNARIO
+            {return ternario}
             / agrupacion:AGRUPACION
             {return agrupacion}
             / referenciaVariable:REFERENCIAVARIABLE
@@ -69,6 +68,55 @@ EXPRESION =  booleano:BOOLEANO
             {return cadena}
 
 
+TERNARIO =  condicion:LOGICO _ "?" _ expTrue:LOGICO _ ":"_ expFalse:LOGICO _ 
+            { return NuevoNodo('ternario', {condicion, expTrue, expFalse }) }
+            / LOGICO
+
+LOGICO = OR
+
+OR = izquierda:AND expansion:(_ operador:("||") _ derecha:AND 
+{return { tipo: operador, derecha }})* { 
+    return expansion.reduce(
+        (operacionAnterior, operacionActual) => {
+        const { tipo, derecha } = operacionActual
+        return NuevoNodo('OperacionBinaria', { operador:tipo, izquierda: operacionAnterior, derecha })
+        },
+        izquierda
+    )
+}
+
+AND = izquierda:IGUALDAD expansion:(_ operador:("&&") _ derecha:IGUALDAD 
+{return { tipo: operador, derecha}})* { 
+    return expansion.reduce(
+        (operacionAnterior, operacionActual) => {
+            const { tipo, derecha } = operacionActual
+            return NuevoNodo('OperacionBinaria', { operador:tipo, izquierda: operacionAnterior, derecha })
+            },
+            izquierda
+        )
+}
+
+IGUALDAD = izquierda:RELACIONAL expansion:(_ operador:("=="/"!=") _ derecha:RELACIONAL 
+{return { tipo: operador, derecha } })* { 
+return expansion.reduce(
+    (operacionAnterior, operacionActual) => {
+        const { tipo, derecha } = operacionActual
+        return NuevoNodo('OperacionBinaria', { operador:tipo, izquierda: operacionAnterior, derecha })
+        },
+        izquierda
+    )
+}
+
+RELACIONAL = izquierda:ARITMETICA expansion:(_ operador:("<="/">="/"<"/">") _ derecha:ARITMETICA 
+{ return { tipo: operador, derecha } })* { 
+    return expansion.reduce(
+        (operacionAnterior, operacionActual) => {
+        const { tipo, derecha } = operacionActual
+        return NuevoNodo('OperacionBinaria', { operador:tipo, izquierda: operacionAnterior, derecha })
+        },
+        izquierda
+    )
+}
 
 ARITMETICA = SUMA
 
