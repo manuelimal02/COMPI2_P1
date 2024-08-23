@@ -353,8 +353,8 @@ return expansion.reduce(
   var peg$f41 = function() {return text()};
   var peg$f42 = function() {return text()};
   var peg$f43 = function() { return text(); };
-  var peg$f44 = function() {return NuevoNodo('decimal', {valor: text()})};
-  var peg$f45 = function() {return NuevoNodo('entero', {valor: text()})};
+  var peg$f44 = function() {return NuevoNodo('decimal', {valor: parseFloat(text())})};
+  var peg$f45 = function() {return NuevoNodo('entero', {valor: parseInt(text())})};
   var peg$f46 = function(contenido) {   
                 var text = contenido.join('');
                 text = text.replace(/\\n/g, "\n");

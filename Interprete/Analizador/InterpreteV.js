@@ -1,7 +1,7 @@
 import { Entorno } from "../Entorno/Entorno.js";
 import { BaseVisitor } from "../Visitor/Visitor.js";
 import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
-import { OperacionBinariaHandler } from "../Instruccion/Arimetica.js";
+import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -18,7 +18,6 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionBinaria']}
     */
     visitOperacionBinaria(node) {
-        console.log(node);
         const izquierda = node.izquierda.accept(this);
         const derecha = node.derecha.accept(this);
         const handler = new OperacionBinariaHandler(node.operador, izquierda, derecha);
@@ -109,7 +108,6 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitAsignacion']}
     */
     visitAsignacion(node) {
-        console.log(node);
         const valor = node.asignacion.accept(this);
         this.entornoActual.assignVariable(node.id, valor);
         return valor;

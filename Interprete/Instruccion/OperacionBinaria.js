@@ -27,6 +27,20 @@ export class OperacionBinariaHandler {
                 return this.validarIgualdad();
             case '!=':  
                 return this.validarDesigualdad();
+            case '>':
+                return this.validarMayorQue();
+            case '>=':
+                return this.validarMayorIgualQue();
+            case '<':
+                return this.validarMenorQue();
+            case '<=':
+                return this.validarMenorIgualQue();
+            case '&&':
+                return this.validarAnd();
+            case '||':
+                return this.validarOr();
+            case '!':
+                return this.validarNot();
             default:
                 throw new Error(`Operador No Reconocido: ${this.operador}`);
         }
@@ -75,8 +89,6 @@ export class OperacionBinariaHandler {
             throw new Error("Advertencia: División por cero. Resultado será null.");
         }
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            console.log(this.izquierda);
-            console.log(this.derecha);
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
                 return parseInt(this.izquierda / this.derecha);  // int / int = int
             } else {
@@ -125,6 +137,63 @@ export class OperacionBinariaHandler {
             return this.izquierda.localeCompare(this.derecha) !== 0;
         } else {
             return this.izquierda !== this.derecha;
+        }
+    }
+
+    validarMayorQue() {
+        this.validarTiposParaComparacion();
+        return this.izquierda > this.derecha;
+    }
+
+    validarMayorIgualQue() {
+        this.validarTiposParaComparacion();
+        return this.izquierda >= this.derecha;
+    }
+
+    validarMenorQue() {
+        this.validarTiposParaComparacion();
+        return this.izquierda < this.derecha;
+    }
+
+    validarMenorIgualQue() {
+        this.validarTiposParaComparacion();
+        return this.izquierda <= this.derecha;
+    }
+
+    validarTiposParaComparacion() {
+        const tiposValidos = ['number', 'string'];
+        if (!tiposValidos.includes(typeof this.izquierda) || !tiposValidos.includes(typeof this.derecha)) {
+            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (typeof this.izquierda !== typeof this.derecha) {
+            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (typeof this.izquierda === 'string' && this.izquierda.length !== 1 && this.derecha.length !== 1) {
+            throw new Error(`Error: Comparación de caracteres solo permitida entre literales de un solo carácter.`);
+        }
+    }
+
+    validarAnd() {
+        if (typeof this.izquierda === 'boolean' && typeof this.derecha === 'boolean') {
+            return this.izquierda && this.derecha;
+        } else {
+            throw new Error(`Error: Operación AND solo se permite entre valores booleanos.`);
+        }
+    }
+
+    validarOr() {
+        if (typeof this.izquierda === 'boolean' && typeof this.derecha === 'boolean') {
+            return this.izquierda || this.derecha;
+        } else {
+            throw new Error(`Error: Operación OR solo se permite entre valores booleanos.`);
+        }
+    }
+
+    validarNot() {
+        if (typeof this.izquierda === 'boolean') {
+            return !this.izquierda;
+        } else {
+            throw new Error(`Error: Operación NOT solo se permite sobre un valor booleano.`);
         }
     }
 }
