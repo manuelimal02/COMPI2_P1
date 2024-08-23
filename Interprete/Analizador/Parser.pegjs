@@ -57,16 +57,12 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
 
 EXPRESION =  booleano:BOOLEANO
             {return booleano}
-            / referenciaVariable:REFERENCIAVARIABLE
-            {return referenciaVariable}
             /aritmetica:ARITMETICA
             {return aritmetica}
             / agrupacion:AGRUPACION
             {return agrupacion}
-            /decimal:DECIMAL
-            {return decimal}
-            / entero:ENTERO
-            {return entero}
+            / referenciaVariable:REFERENCIAVARIABLE
+            {return referenciaVariable}
             / caracter:CARACTER
             {return caracter}
             / cadena:CADENA
@@ -107,6 +103,9 @@ OTRAEXPRESION = decimal:DECIMAL
             {return caracter}
             / cadena:CADENA
             {return cadena}
+            / agrupacion:AGRUPACION
+            {return agrupacion}
+            / referenciaVariable:REFERENCIAVARIABLE
 
 TIPO = "int" 
             {return text()}
@@ -124,7 +123,7 @@ TIPO = "int"
 IDENTIFICADOR = [a-zA-Z_][a-zA-Z0-9_]* 
             { return text(); }
 
-DECIMAL = [0-9]+ ("." [0-9]+)?
+DECIMAL = [0-9]+ "." [0-9]+
             {return NuevoNodo('decimal', {valor: parseFloat(text())})}
 
 ENTERO = [0-9]+
