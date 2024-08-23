@@ -52,12 +52,16 @@ BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}"
             { return NuevoNodo('Bloque', { sentencias }) }
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
-{ return NuevoNodo('asignacion', { id, asignacion }) }
+            { return NuevoNodo('asignacion', { id, asignacion }) }
+            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
+            { return NuevoNodo('asignacion', 
+            { id, asignacion: NuevoNodo('OperacionBinaria', 
+            { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }
 
-EXPRESION =  booleano:BOOLEANO
-            {return booleano}
-            / ternario:TERNARIO
+EXPRESION =  ternario:TERNARIO
             {return ternario}
+            /booleano:BOOLEANO
+            {return booleano}
             / agrupacion:AGRUPACION
             {return agrupacion}
             / referenciaVariable:REFERENCIAVARIABLE
@@ -66,7 +70,6 @@ EXPRESION =  booleano:BOOLEANO
             {return caracter}
             / cadena:CADENA
             {return cadena}
-
 
 TERNARIO =  condicion:LOGICO _ "?" _ expTrue:LOGICO _ ":"_ expFalse:LOGICO _ 
             { return NuevoNodo('ternario', {condicion, expTrue, expFalse }) }

@@ -15,6 +15,10 @@ export class OperacionBinariaHandler {
         switch (this.operador) {
             case '+':
                 return this.validarSuma();
+            case '+=': 
+                return this.validarSumaImplicita();
+            case '-=': 
+                return this.validarRestaImplicita();
             case '-':
                 return this.validarResta();
             case '*':
@@ -46,15 +50,47 @@ export class OperacionBinariaHandler {
         }
     }
 
+    validarSumaImplicita() {
+        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
+            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
+                return parseInt(this.izquierda + this.derecha);
+            } else if (!Number.isInteger(this.izquierda)) {
+                return parseFloat(this.izquierda + this.derecha);
+            } else if (Number.isInteger(this.izquierda) && !Number.isInteger(this.derecha)) {
+                throw new Error(`Error: No se puede realizar la operación 'int += float'.`);
+            }
+        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
+            return this.izquierda + this.derecha;
+        } else {
+            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+    }
+
+    validarRestaImplicita() {
+        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
+            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
+                return parseInt(this.izquierda - this.derecha);
+            } else if (!Number.isInteger(this.izquierda)) {
+                return parseFloat(this.izquierda - this.derecha);
+            } else if (Number.isInteger(this.izquierda) && !Number.isInteger(this.derecha)) {
+                throw new Error(`Error: No se puede realizar la operación 'int -= float'. La variable 'var1' es de tipo int.`);
+            }
+        } else {
+            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+    }
+    
+    
+
     validarSuma() {
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda + this.derecha);  // int + int = int
+                return parseInt(this.izquierda + this.derecha); 
             } else {
-                return parseFloat(this.izquierda + this.derecha);  // float + float = float, int + float = float
+                return parseFloat(this.izquierda + this.derecha); 
             }
         } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
-            return this.izquierda + this.derecha;  // string + string = string
+            return this.izquierda + this.derecha; 
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
         }
@@ -63,9 +99,9 @@ export class OperacionBinariaHandler {
     validarResta() {
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda - this.derecha);  // int - int = int
+                return parseInt(this.izquierda - this.derecha);
             } else {
-                return parseFloat(this.izquierda - this.derecha);  // float - float = float, int - float = float
+                return parseFloat(this.izquierda - this.derecha);
             }
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
@@ -75,9 +111,9 @@ export class OperacionBinariaHandler {
     validarMultiplicacion() {
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda * this.derecha);  // int * int = int
+                return parseInt(this.izquierda * this.derecha);
             } else {
-                return parseFloat(this.izquierda * this.derecha);  // float * float = float, int * float = float
+                return parseFloat(this.izquierda * this.derecha);
             }
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
@@ -90,9 +126,9 @@ export class OperacionBinariaHandler {
         }
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda / this.derecha);  // int / int = int
+                return parseInt(this.izquierda / this.derecha);
             } else {
-                return this.izquierda / this.derecha;  // float / float = float, int / float = float
+                return this.izquierda / this.derecha;
             }
         } else {
             throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
@@ -105,7 +141,7 @@ export class OperacionBinariaHandler {
         }
         if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
             if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda % this.derecha);  // int % int = int
+                return parseInt(this.izquierda % this.derecha);
             } else {
                 throw new Error(`Error: Módulo solo se permite entre enteros.`);
             }
