@@ -48,6 +48,8 @@ SENTENCIA =  if_1:IF
             {return asignacion}
             /switch_s:SWITCH
             {return switch_s}
+            /while_s:WHILE
+            {return while_s}
 
 IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -70,6 +72,10 @@ SWITCHCASE = _ "case" _ valor:EXPRESION _ ":" _ bloquecase:INSTRUCCIONES*
 DEFAULTCASE = _ "default" _ ":" _ sentencias:SENTENCIA* 
             {return { sentencias } }
 
+WHILE = _ "while" _ "(" _ condicion:EXPRESION _ ")" _ sentencias:BLOQUE 
+            {return NuevoNodo('While', { condicion, sentencias }) }
+
+For = "for" _ "("_ vars:DECLARACION _ cond:EXPRESION _ ";" _ incremento:EXPRESION _ ")" _ sentencia:SENTENCIA { return crearHoja('for', { vars, cond, incremento, sentencia }) }
 
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 

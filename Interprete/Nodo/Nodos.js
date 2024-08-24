@@ -500,24 +500,24 @@ export class While extends Expresion {
 
     /**
     * @param {Object} options
-    * @param {Expresion} options.cond Condicion del while
- * @param {Expresion} options.stmt Cuerpo del while
+    * @param {Expresion} options.condicion Condicion del while
+ * @param {Expresion} options.sentencias Cuerpo del while
     */
-    constructor({ cond, stmt }) {
+    constructor({ condicion, sentencias }) {
         super();
         
         /**
          * Condicion del while
          * @type {Expresion}
         */
-        this.cond = cond;
+        this.condicion = condicion;
 
 
         /**
          * Cuerpo del while
          * @type {Expresion}
         */
-        this.stmt = stmt;
+        this.sentencias = sentencias;
 
     }
 

@@ -151,6 +151,9 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitWhile']}
     */
     visitWhile(node) {
+        while (node.condicion.accept(this)) {
+            node.sentencias.accept(this);
+        }
     }
 
     visitSwitch(node) {
