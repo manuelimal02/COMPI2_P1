@@ -14,13 +14,14 @@ export class TernarioHandler {
 
     EjecutarHandler() {
         const resultadoCondicion = this.condicion.accept(this.visitor);
-        if (typeof resultadoCondicion !== 'boolean') {
+        if (resultadoCondicion.tipo !== 'boolean') {
             throw new Error('Error: La condición en una expresión ternaria debe ser de tipo boolean.');
         }
-        if (resultadoCondicion) {
-            return this.verdadero.accept(this.visitor);
+        if (resultadoCondicion.valor) {
+            return  this.verdadero.accept(this.visitor);
         } else {
-            return this.falso.accept(this.visitor);
+            return  this.falso.accept(this.visitor);
         }
     }
+    
 }

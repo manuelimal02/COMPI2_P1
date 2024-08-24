@@ -103,8 +103,10 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitTernario']}
     */
     visitTernario(node) {
+        const TernarioHandler1 = new TernarioHandler(node.condicion, node.verdadero, node.falso, this);
+        return TernarioHandler1.EjecutarHandler();
     }
-
+    
     /**
     * @type {BaseVisitor['visitAsignacion']}
     */
