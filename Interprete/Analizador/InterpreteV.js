@@ -20,7 +20,6 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionBinaria']}
     */
     visitOperacionBinaria(node) {
-        console.log(node);
         const izquierda = node.izquierda.accept(this);
         const derecha = node.derecha.accept(this);
         const handler = new OperacionBinariaHandler(node.operador, izquierda, derecha);
@@ -155,7 +154,9 @@ export class Interprete extends BaseVisitor {
             node.sentencias.accept(this);
         }
     }
-
+    /**
+    * @type {BaseVisitor['visitSwitch']}
+    */
     visitSwitch(node) {
         var resto=false;
         for (const caso of node.cases) {
@@ -173,5 +174,19 @@ export class Interprete extends BaseVisitor {
         for(const stmt of node.default1.sentencias){
             stmt.accept(this);
         }
+    }
+
+    /**
+    * @type {BaseVisitor['visitFor']}
+    */
+    visitFor(node) {
+        const entornoAnterior = this.entornoActual
+        this.entornoActual = new Entorno(entornoAnterior)
+        node.declaracion.accept(this);
+        while(node.condicion.accept(this)){
+            node.sentencia.accept(this);
+            node.incremento.accept(this);
+        }    
+        this.entornoActual = entornoAnterior
     }
 }

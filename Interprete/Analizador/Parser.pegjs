@@ -17,7 +17,8 @@
         'Bloque': Nodos.Bloque,
         'If': Nodos.If,
         'While': Nodos.While,
-        'Switch': Nodos.Switch
+        'Switch': Nodos.Switch,
+        'For': Nodos.For
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -50,6 +51,8 @@ SENTENCIA =  if_1:IF
             {return switch_s}
             /while_s:WHILE
             {return while_s}
+            /for_s:FOR
+            {return for_s}
 
 IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -75,15 +78,21 @@ DEFAULTCASE = _ "default" _ ":" _ sentencias:SENTENCIA*
 WHILE = _ "while" _ "(" _ condicion:EXPRESION _ ")" _ sentencias:BLOQUE 
             {return NuevoNodo('While', { condicion, sentencias }) }
 
-For = "for" _ "("_ vars:DECLARACION _ cond:EXPRESION _ ";" _ incremento:EXPRESION _ ")" _ sentencia:SENTENCIA { return crearHoja('for', { vars, cond, incremento, sentencia }) }
-
+FOR = "for" _ "("_ declaracion:DECLARACION _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
+            {return NuevoNodo('For', { declaracion, condicion, incremento, sentencia }) }
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', { id, asignacion }) }
             /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', 
+
             { id, asignacion: NuevoNodo('OperacionBinaria', 
             { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }
+
+            / id:IDENTIFICADOR _ operador:("++" / "--") _ ";" _ 
+            { return NuevoNodo('asignacion', 
+            { id, asignacion: NuevoNodo('OperacionUnaria', 
+            { operador, datos: NuevoNodo('ReferenciaVariable', { id }) }) }) }
 
 EXPRESION =  ternario:TERNARIO
             {return ternario}
@@ -98,7 +107,7 @@ EXPRESION =  ternario:TERNARIO
             / cadena:CADENA
             {return cadena}
 
-Typeof = "typeof" _ exp:EXPRESION _ {return crearHoja('tipoOf', {exp})}
+Typeof = "typeof" _ exp:EXPRESION _ {return NuevoNodo('tipoOf', {exp})}
 
 TERNARIO =  condicion:LOGICO _ "?" _ verdadero:LOGICO _ ":"_ falso:LOGICO _ 
             { return NuevoNodo('ternario', {condicion, verdadero, falso }) }

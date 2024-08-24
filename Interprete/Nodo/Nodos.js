@@ -570,4 +570,53 @@ export class Switch extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch }
+export class For extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.declaracion Inicializacion del for
+ * @param {Expresion} options.condicion Condicion del for
+ * @param {Expresion} options.incremento Incremento del for
+ * @param {Expresion} options.sentencia Cuerpo del for
+    */
+    constructor({ declaracion, condicion, incremento, sentencia }) {
+        super();
+        
+        /**
+         * Inicializacion del for
+         * @type {Expresion}
+        */
+        this.declaracion = declaracion;
+
+
+        /**
+         * Condicion del for
+         * @type {Expresion}
+        */
+        this.condicion = condicion;
+
+
+        /**
+         * Incremento del for
+         * @type {Expresion}
+        */
+        this.incremento = incremento;
+
+
+        /**
+         * Cuerpo del for
+         * @type {Expresion}
+        */
+        this.sentencia = sentencia;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitFor(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For }
