@@ -83,16 +83,26 @@ FOR = "for" _ "("_ declaracion:DECLARACION _ condicion:EXPRESION _ ";" _ increme
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', { id, asignacion }) }
-            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
-            { return NuevoNodo('asignacion', 
 
+            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ 
+            { return NuevoNodo('asignacion', 
             { id, asignacion: NuevoNodo('OperacionBinaria', 
             { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }
 
-            / id:IDENTIFICADOR _ operador:("++" / "--") _ ";" _ 
+            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
+            { return NuevoNodo('asignacion', 
+            { id, asignacion: NuevoNodo('OperacionBinaria', 
+            { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }
+            
+            / id:IDENTIFICADOR _ operador:("++" / "--") _  ";" _
             { return NuevoNodo('asignacion', 
             { id, asignacion: NuevoNodo('OperacionUnaria', 
-            { operador, datos: NuevoNodo('ReferenciaVariable', { id }) }) }) }
+            { operador, expresion: NuevoNodo('ReferenciaVariable', { id }) }) }) }
+
+            / id:IDENTIFICADOR _ operador:("++" / "--") _ 
+            { return NuevoNodo('asignacion', 
+            { id, asignacion: NuevoNodo('OperacionUnaria', 
+            { operador, expresion: NuevoNodo('ReferenciaVariable', { id }) }) }) }
 
 EXPRESION =  ternario:TERNARIO
             {return ternario}
@@ -170,6 +180,7 @@ SUMA = izquierda:MULTIPLICACION expansion:( _ operador:("+" / "-") _ derecha:MUL
         izquierda
     )
 }
+
 MULTIPLICACION = izquierda:UNARIA expansion:( _ operador:("*" / "/" / "%") _ derecha:UNARIA {return {tipo: operador, derecha}})* {
     return expansion.reduce(
         (operacionAnterior, operacionActual) => {
@@ -179,13 +190,12 @@ MULTIPLICACION = izquierda:UNARIA expansion:( _ operador:("*" / "/" / "%") _ der
         izquierda
     )
 }
-UNARIA = "-" _ expresion:OTRAEXPRESION {return NuevoNodo('OperacionUnaria', {operador: '-', expresion: expresion})}
-        / OTRAEXPRESION
 
-INCDEC= _ expresion:OTRAEXPRESION _ "++"
-            { return NuevoNodo('OperacionUnaria', { operador: '++', expresion: expresion }) }
-            / _ expresion:OTRAEXPRESION _ "--"
-            { return NuevoNodo('OperacionUnaria', { operador: '--', expresion: expresion }) }
+UNARIA = "-" _ expresion:OTRAEXPRESION 
+            {return NuevoNodo('OperacionUnaria', {operador: '-', expresion: expresion})}
+        / "!" _ expresion:OTRAEXPRESION 
+            {return NuevoNodo('OperacionUnaria', {operador: '!', expresion: expresion})}
+        / OTRAEXPRESION
 
 OTRAEXPRESION = decimal:DECIMAL
             {return decimal}
