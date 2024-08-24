@@ -145,8 +145,9 @@ export class Entero extends Expresion {
     /**
     * @param {Object} options
     * @param {int} options.valor Valor del entero
+ * @param {string} options.tipo Tipo Int
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
@@ -154,6 +155,13 @@ export class Entero extends Expresion {
          * @type {int}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo Int
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -170,8 +178,9 @@ export class Decimal extends Expresion {
     /**
     * @param {Object} options
     * @param {float} options.valor Valor del float
+ * @param {string} options.tipo Tipo Float
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
@@ -179,6 +188,13 @@ export class Decimal extends Expresion {
          * @type {float}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo Float
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -195,8 +211,9 @@ export class Cadena extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.valor Valor del la cadena
+ * @param {string} options.tipo Tipo Cadena
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
@@ -204,6 +221,13 @@ export class Cadena extends Expresion {
          * @type {string}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo Cadena
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -220,8 +244,9 @@ export class Caracter extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.valor Valor del caracter
+ * @param {string} options.tipo Tipo Char
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
@@ -229,6 +254,13 @@ export class Caracter extends Expresion {
          * @type {string}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo Char
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 
@@ -245,8 +277,9 @@ export class Booleano extends Expresion {
     /**
     * @param {Object} options
     * @param {boolean} options.valor Valor del booleano
+ * @param {string} options.tipo Tipo Boolean
     */
-    constructor({ valor }) {
+    constructor({ valor, tipo }) {
         super();
         
         /**
@@ -254,6 +287,13 @@ export class Booleano extends Expresion {
          * @type {boolean}
         */
         this.valor = valor;
+
+
+        /**
+         * Tipo Boolean
+         * @type {string}
+        */
+        this.tipo = tipo;
 
     }
 

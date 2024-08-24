@@ -1,11 +1,4 @@
 export class DeclaracionVariableHandler {
-    /**
-         * @param {string} tipo
-         * @param {string} nombre
-         * @param {any} expresion
-         * @param {Entorno} entornoActual
-         * @param {BaseVisitor} visitor
-         */
     constructor(tipo, nombre, expresion, entornoActual, visitor) {
         this.tipo = tipo;
         this.nombre = nombre;
@@ -18,7 +11,7 @@ export class DeclaracionVariableHandler {
         let valor;
         let tipoInferido = this.tipo;
         if (this.tipo === 'var' && !this.expresion) {
-            throw new Error(`La variable "${this.nombre}" de tipo 'var' debe tener una expresión para inferir su tipo.`);
+            throw new Error(`La Variable "${this.nombre}" De Tipo "var" Debe Tener Una Expresión Para Inferir Su Tipo.`);
         }
         if (this.expresion) {
             valor = this.expresion.accept(this.visitor);
@@ -32,12 +25,9 @@ export class DeclaracionVariableHandler {
     }
 
     DefinirTipoVar(valor) {
-        if (typeof valor === 'number') {
-            return Number.isInteger(valor) ? 'int' : 'float';
-        } else if (typeof valor === 'string') {
-            return valor.length === 1 ? 'char' : 'string';
-        } else if (typeof valor === 'boolean') {
-            return 'bool';
+        const tipo = valor.tipo;
+        if (tipo === 'int' || tipo === 'float' || tipo === 'char' || tipo === 'string' || tipo === 'bool') {
+            return tipo;
         } else {
             throw new Error(`No Se Puede Determinar El Tipo De Dato De: "${this.nombre}".`);
         }
@@ -45,29 +35,19 @@ export class DeclaracionVariableHandler {
 
     ValorPorDefecto(tipo) {
         switch (tipo) {
-            case 'int': return 0;
-            case 'float': return 0.0;
-            case 'string': return '';
-            case 'bool': return true;
-            case 'char': return '\0';
-            case 'var': return null;
+            case 'int': return {valor: 0, tipo: 'int'};
+            case 'float': return {valor: 0.0, tipo: 'float'};
+            case 'string': return {valor: '', tipo: 'string'};
+            case 'bool': return {valor: true, tipo: 'bool'};
+            case 'char': return {valor: '\0', tipo: 'char'};
+            case 'var': return {valor: null, tipo: 'var'};
             default: throw new Error(`Tipo De Variable: "${tipo}" No Válido.`);
         }
     }
 
     DeclararVariable(tipoInferido, valor) {
         const entorno = this.entornoActual;
-        if (tipoInferido === 'int' && typeof valor === 'number' && Number.isInteger(valor)) {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
-        } else if (tipoInferido === 'float' && typeof valor === 'number') {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
-        }else if (tipoInferido === 'char' && typeof valor === 'string' && valor.length === 1) {
-                entorno.setVariable(tipoInferido, this.nombre, valor);
-        } else if (tipoInferido === 'string' && typeof valor === 'string') {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
-        } else if (tipoInferido === 'bool' && typeof valor === 'boolean') {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
-        } else if (tipoInferido === 'var') {
+        if (tipoInferido === valor.tipo) {
             entorno.setVariable(tipoInferido, this.nombre, valor);
         } else {
             throw new Error(`La Variable: "${this.nombre}" Debe Ser Tipo: "${tipoInferido}".`);

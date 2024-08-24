@@ -208,7 +208,7 @@ TIPO = "int"
             / "string" 
             {return text()}
             / "boolean" 
-            {return "bool"}
+            {return text()}
             / "char" 
             {return text()}
             / "var"
@@ -218,10 +218,10 @@ IDENTIFICADOR = [a-zA-Z_][a-zA-Z0-9_]*
             { return text(); }
 
 DECIMAL = [0-9]+ "." [0-9]+
-            {return NuevoNodo('decimal', {valor: parseFloat(text())})}
+            {return NuevoNodo('decimal', {valor: parseFloat(text()), tipo: "float"})}
 
 ENTERO = [0-9]+
-            {return NuevoNodo('entero', {valor: parseInt(text())})}
+            {return NuevoNodo('entero', {valor: parseInt(text()), tipo: "int"})}
 
 CADENA = "\"" contenido:[^"]* "\""
             {   
@@ -232,18 +232,18 @@ CADENA = "\"" contenido:[^"]* "\""
                 text = text.replace(/\\r/g, "\r");
                 text = text.replace(/\\t/g, "\t");
                 text = text.replace(/\\\'/g, "'");
-                return NuevoNodo('cadena', {valor: text});
+                return NuevoNodo('cadena', {valor: text, tipo: "string"});
             }
 
 CARACTER = "'" caracter:[\x00-\x7F] "'" 
             { 
-                return NuevoNodo('caracter', { valor: caracter });
+                return NuevoNodo('caracter', { valor: caracter, tipo: "char" });
             }
 
 BOOLEANO = "true" 
-            {return NuevoNodo('booleano', {valor: true})}
+            {return NuevoNodo('booleano', {valor: true, tipo: "boolean"})}
             / "false" 
-            {return NuevoNodo('booleano', {valor: false})}
+            {return NuevoNodo('booleano', {valor: false, tipo: "boolean"})}
 
 AGRUPACION = _ "(" _ expresion:EXPRESION _ ")"_ 
             {return NuevoNodo('Agrupacion', {expresion})}
