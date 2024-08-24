@@ -5,6 +5,7 @@ import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
 import { SwitchHandler } from "../Instruccion/Switch.js";
+import { WhileHandler } from "../Instruccion/While.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -37,6 +38,7 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitAgrupacion']}
     */
     visitAgrupacion(node) {
+        return node.expresion.accept(this);
     }
 
     /**
@@ -139,6 +141,12 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitWhile']}
     */
     visitWhile(node) {
+        const condicion = node.condicion.accept(this);
+        if (condicion.tipo !== 'boolean') {
+            throw new Error('Error: La Condición En Una Estructura While Debe Ser De Tipo Boolean.');
+        }
+        const whileHandler1 = new WhileHandler(node.condicion, node.sentencias, this);
+        whileHandler1.EjecutarHandler();
     }
     /**
     * @type {BaseVisitor['visitSwitch']}
@@ -153,6 +161,7 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitFor']}
     */
     visitFor(node) {
+        
 
     }
 }
