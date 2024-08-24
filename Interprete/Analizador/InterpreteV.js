@@ -20,6 +20,10 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionBinaria']}
     */
     visitOperacionBinaria(node) {
+        const izquierda = node.izquierda.accept(this);
+        const derecha = node.derecha.accept(this);
+        const handler = new OperacionBinariaHandler(node.operador, izquierda, derecha);
+        return handler.EjecutarHandler();
     }
 
     /**

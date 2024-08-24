@@ -50,184 +50,348 @@ export class OperacionBinariaHandler {
         }
     }
 
-    validarSumaImplicita() {
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda + this.derecha);
-            } else if (!Number.isInteger(this.izquierda)) {
-                return parseFloat(this.izquierda + this.derecha);
-            } else if (Number.isInteger(this.izquierda) && !Number.isInteger(this.derecha)) {
-                throw new Error(`Error: No se puede realizar la operación 'int += float'.`);
-            }
-        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
-            return this.izquierda + this.derecha;
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
-        }
-    }
-
-    validarRestaImplicita() {
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda - this.derecha);
-            } else if (!Number.isInteger(this.izquierda)) {
-                return parseFloat(this.izquierda - this.derecha);
-            } else if (Number.isInteger(this.izquierda) && !Number.isInteger(this.derecha)) {
-                throw new Error(`Error: No se puede realizar la operación 'int -= float'. La variable 'var1' es de tipo int.`);
-            }
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
-        }
-    }
-
     validarSuma() {
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda + this.derecha); 
-            } else {
-                return parseFloat(this.izquierda + this.derecha); 
+        if (this.izquierda.tipo === 'int') {
+            switch (this.derecha.tipo) {
+                //int + int = int
+                case 'int':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'int'};
+                //int + float = float
+                case 'float':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
-        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
-            return this.izquierda + this.derecha; 
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
         }
+        if(this.izquierda.tipo === 'float') {
+            switch(this.derecha.tipo) {
+                //float + int = float
+                case 'int':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'float'};
+                //float + float = float
+                case 'float':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if(this.izquierda.tipo === 'string') {
+            //string + string = string
+            if(this.derecha.tipo === 'string') {
+                return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'string'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }  
     }
 
     validarResta() {
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda - this.derecha);
-            } else {
-                return parseFloat(this.izquierda - this.derecha);
+        if (this.izquierda.tipo === 'int') {
+            switch (this.derecha.tipo) {
+                //int - int = int
+                case 'int':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'int'};
+                //int - float = float
+                case 'float':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (this.izquierda.tipo === 'float') {
+            switch (this.derecha.tipo) {
+                //float - int = float
+                case 'int':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'float'};
+                //float - float = float
+                case 'float':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
     }
 
     validarMultiplicacion() {
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda * this.derecha);
-            } else {
-                return parseFloat(this.izquierda * this.derecha);
+        if(this.izquierda.tipo === 'int') {
+            switch(this.derecha.tipo) {
+                //int * int = int
+                case 'int':
+                    return {valor: this.izquierda.valor * this.derecha.valor, tipo: 'int'};
+                //int * float = float
+                case 'float':
+                    return {valor: this.izquierda.valor * this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (this.izquierda.tipo === 'float') {
+            switch (this.derecha.tipo) {
+                //float * int = float
+                case 'int':
+                    return {valor: this.izquierda.valor * this.derecha.valor, tipo: 'float'};
+                //float * float = float
+                case 'float':
+                    return {valor: this.izquierda.valor * this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
     }
 
     validarDivision() {
-        if (this.derecha === 0) {
+        if (this.derecha.valor === 0) {
             throw new Error("Advertencia: División por cero. Resultado será null.");
         }
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda / this.derecha);
-            } else {
-                return this.izquierda / this.derecha;
+        if (this.izquierda.tipo === 'int') {
+            switch (this.derecha.tipo) {
+                //int / int = int
+                case 'int':
+                    return {valor: parseInt(this.izquierda.valor / this.derecha.valor), tipo: 'int'};
+                //int / float = float
+                case 'float':
+                    return {valor: this.izquierda.valor / this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        }
+        if (this.izquierda.tipo === 'float') {
+            switch (this.derecha.tipo) {
+                //float / int = float
+                case 'int':
+                    return {valor: this.izquierda.valor / this.derecha.valor, tipo: 'float'};
+                //float / float = float
+                case 'float':
+                    return {valor: this.izquierda.valor / this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
     }
 
     validarModulo() {
-        if (this.derecha === 0) {
+        if (this.derecha.valor === 0) {
             throw new Error("Advertencia: Módulo por cero. Resultado será null.");
         }
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            if (Number.isInteger(this.izquierda) && Number.isInteger(this.derecha)) {
-                return parseInt(this.izquierda % this.derecha);
-            } else {
-                throw new Error(`Error: Módulo solo se permite entre enteros.`);
-            }
-        } else {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        if (this.izquierda.tipo === 'int' && this.derecha.tipo === 'int') {
+            return {valor: this.izquierda.valor % this.derecha.valor, tipo: 'int'};
+        }else{
+            throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
         }
     }
-
+    
     validarIgualdad() {
-        if (typeof this.izquierda !== typeof this.derecha) {
-            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        if(this.izquierda.tipo === 'int') {
+            switch(this.derecha.tipo) {
+                case 'int':
+                    return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+                case 'float':
+                    return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            return this.izquierda === this.derecha;
-        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
-            return this.izquierda.localeCompare(this.derecha) === 0;
-        } else {
-            return this.izquierda === this.derecha;
+        if(this.izquierda.tipo === 'float') {
+            switch(this.derecha.tipo) {
+                case 'int':
+                    return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+                case 'float':
+                    return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
+        if(this.izquierda.tipo === 'string') {
+            if(this.derecha.tipo === 'string') {
+                return {valor: this.izquierda.valor.localeCompare(this.derecha.valor), tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if(this.izquierda.tipo === 'boolean') {
+            if(this.derecha.tipo === 'boolean') {
+                return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if (this.izquierda.tipo === 'char') {
+            if (this.derecha.tipo === 'char') {
+                return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
     }
 
     validarDesigualdad() {
-        if (typeof this.izquierda !== typeof this.derecha) {
-            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        if(this.izquierda.tipo === 'int') {
+            switch(this.derecha.tipo) {
+                case 'int':
+                    return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+                case 'float':
+                    return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
-        if (typeof this.izquierda === 'number' && typeof this.derecha === 'number') {
-            return this.izquierda !== this.derecha;
-        } else if (typeof this.izquierda === 'string' && typeof this.derecha === 'string') {
-            return this.izquierda.localeCompare(this.derecha) !== 0;
-        } else {
-            return this.izquierda !== this.derecha;
+        if (this.izquierda.tipo === 'float') {
+            switch (this.derecha.tipo) {
+                case 'int':
+                    return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+                case 'float':
+                    return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
+        if (this.izquierda.tipo === 'string') {
+            if (this.derecha.tipo === 'string') {
+                return {valor: this.izquierda.valor.localeCompare(this.derecha.valor) !== 0, tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if (this.izquierda.tipo === 'boolean') {
+            if (this.derecha.tipo === 'boolean') {
+                return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if (this.izquierda.tipo === 'char') {
+            if (this.derecha.tipo === 'char') {
+                return {valor: this.izquierda.valor !== this.derecha.valor, tipo: 'boolean'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
     }
 
     validarMayorQue() {
         this.validarTiposParaComparacion();
-        return this.izquierda > this.derecha;
+        return {valor: this.izquierda.valor > this.derecha.valor, tipo: 'boolean'};
     }
-
+    
     validarMayorIgualQue() {
         this.validarTiposParaComparacion();
-        return this.izquierda >= this.derecha;
+        return {valor: this.izquierda.valor >= this.derecha.valor, tipo: 'boolean'};
     }
-
+    
     validarMenorQue() {
         this.validarTiposParaComparacion();
-        return this.izquierda < this.derecha;
+        return {valor: this.izquierda.valor < this.derecha.valor, tipo: 'boolean'};
     }
-
+    
     validarMenorIgualQue() {
         this.validarTiposParaComparacion();
-        return this.izquierda <= this.derecha;
+        return {valor: this.izquierda.valor <= this.derecha.valor, tipo: 'boolean'};
     }
-
+    
     validarTiposParaComparacion() {
-        const tiposValidos = ['number', 'string'];
-        if (!tiposValidos.includes(typeof this.izquierda) || !tiposValidos.includes(typeof this.derecha)) {
-            throw new Error(`Error: Operación no permitida entre tipos ${typeof this.izquierda} y ${typeof this.derecha}`);
+        const tiposValidos = ['int', 'float', 'char'];
+        if (!tiposValidos.includes(this.izquierda.tipo) || !tiposValidos.includes(this.derecha.tipo)) {
+            throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
         }
-        if (typeof this.izquierda !== typeof this.derecha) {
-            throw new Error(`Error: No se puede comparar tipos diferentes ${typeof this.izquierda} y ${typeof this.derecha}`);
+        // Permitir comparaciones entre int y float, pero no otros tipos mezclados
+        if (this.izquierda.tipo !== this.derecha.tipo) {
+            const tiposPermitidos = (this.izquierda.tipo === 'int' && this.derecha.tipo === 'float') ||
+                                    (this.izquierda.tipo === 'float' && this.derecha.tipo === 'int');
+            if (!tiposPermitidos) {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
-        if (typeof this.izquierda === 'string' && this.izquierda.length !== 1 && this.derecha.length !== 1) {
-            throw new Error(`Error: Comparación de caracteres solo permitida entre literales de un solo carácter.`);
+        // Comparación de caracteres
+        if (this.izquierda.tipo === 'char' && this.derecha.tipo === 'char') {
+            if (this.izquierda.valor.length !== 1 || this.derecha.valor.length !== 1) {
+                throw new Error(`Error: Comparación De Caracteres Solo Permitida Entre Literales De Un Solo Carácter.`);
+            }
+            // Convertir a valores ASCII para comparación
+            this.izquierda.valor = this.izquierda.valor.charCodeAt(0);
+            this.derecha.valor = this.derecha.valor.charCodeAt(0);
         }
     }
+    
 
     validarAnd() {
-        if (typeof this.izquierda === 'boolean' && typeof this.derecha === 'boolean') {
-            return this.izquierda && this.derecha;
-        } else {
-            throw new Error(`Error: Operación AND solo se permite entre valores booleanos.`);
+        if (this.izquierda.tipo === 'boolean' && this.derecha.tipo === 'boolean') {
+            return {valor: this.izquierda.valor && this.derecha.valor, tipo: 'boolean'};
+        } else {    
+            throw new Error(`Error: Operación AND Solo Se Permite Entre Valores Booleanos.`);
         }
     }
 
     validarOr() {
-        if (typeof this.izquierda === 'boolean' && typeof this.derecha === 'boolean') {
-            return this.izquierda || this.derecha;
-        } else {
-            throw new Error(`Error: Operación OR solo se permite entre valores booleanos.`);
+        if(this.izquierda.tipo === 'boolean' && this.derecha.tipo === 'boolean') {
+            return {valor: this.izquierda.valor || this.derecha.valor, tipo: 'boolean'};
+        } else {    
+            throw new Error(`Error: Operación OR Solo Se Permite Entre Valores Booleanos.`);
         }
     }
 
     validarNot() {
-        if (typeof this.izquierda === 'boolean') {
-            return !this.izquierda;
+        if (this.izquierda.tipo === 'boolean') {
+            return {valor: !this.izquierda.valor, tipo: 'boolean'};
         } else {
-            throw new Error(`Error: Operación NOT solo se permite sobre un valor booleano.`);
+            throw new Error(`Error: Operación NOT Solo Se Permite Sobre Un Valor Booleano.`);
+        }
+    }
+
+    validarSumaImplicita() {
+        if (this.izquierda.tipo === 'int') {
+            switch (this.derecha.tipo) {
+                //int += int = int
+                case 'int':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'int'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if(this.izquierda.tipo === 'float') {
+            switch(this.derecha.tipo) {
+                //float += int = float
+                case 'int':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'float'};
+                //float += float = float
+                case 'float':
+                    return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if(this.izquierda.tipo === 'string') {
+            //string += string = string
+            if(this.derecha.tipo === 'string') {
+                return {valor: this.izquierda.valor + this.derecha.valor, tipo: 'string'};
+            } else {
+                throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+    }
+
+    validarRestaImplicita() {
+        if (this.izquierda.tipo === 'int') {
+            switch (this.derecha.tipo) {
+                //int -= int = int
+                case 'int':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'int'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
+        }
+        if (this.izquierda.tipo === 'float') {
+            switch (this.derecha.tipo) {
+                //float -= int = float
+                case 'int':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'float'};
+                //float -= float = float
+                case 'float':
+                    return {valor: this.izquierda.valor - this.derecha.valor, tipo: 'float'};
+                default:
+                    throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
+            }
         }
     }
 }
