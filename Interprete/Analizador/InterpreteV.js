@@ -152,4 +152,23 @@ export class Interprete extends BaseVisitor {
     */
     visitWhile(node) {
     }
+
+    visitSwitch(node) {
+        var resto=false;
+        for (const caso of node.cases) {
+            if (caso.valor.accept(this)==node.condicion.accept(this)) {
+                resto=true;
+            }
+            if(resto){
+                const entornoAnterior = this.entornoActual;
+                this.entornoActual = new Entorno(entornoAnterior);
+                for (const stmt of caso.bloquecase) {
+                    stmt.accept(this);}
+                this.entornoActual = entornoAnterior;
+            }
+        }
+        for(const stmt of node.default1.sentencias){
+            stmt.accept(this);
+        }
+    }
 }

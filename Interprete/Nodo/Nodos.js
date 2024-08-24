@@ -529,4 +529,45 @@ export class While extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While }
+export class Switch extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.condicion Condicion del switch
+ * @param {Expresion} options.cases Casos del switch
+ * @param {Expresion} options.default1 Caso por defecto
+    */
+    constructor({ condicion, cases, default1 }) {
+        super();
+        
+        /**
+         * Condicion del switch
+         * @type {Expresion}
+        */
+        this.condicion = condicion;
+
+
+        /**
+         * Casos del switch
+         * @type {Expresion}
+        */
+        this.cases = cases;
+
+
+        /**
+         * Caso por defecto
+         * @type {Expresion}
+        */
+        this.default1 = default1;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitSwitch(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch }

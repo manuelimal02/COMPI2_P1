@@ -16,7 +16,8 @@
         'asignacion': Nodos.Asignacion,
         'Bloque': Nodos.Bloque,
         'If': Nodos.If,
-        'While': Nodos.While
+        'While': Nodos.While,
+        'Switch': Nodos.Switch
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -45,6 +46,8 @@ SENTENCIA =  if_1:IF
             {return bloque}
             /asignacion:ASIGNACION
             {return asignacion}
+            /switch_s:SWITCH
+            {return switch_s}
 
 IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -56,7 +59,18 @@ PRINT = "print(" _ expresion:EXPRESION _ ")" _ ";" _
             {return NuevoNodo('Print', { expresion })}
 
 BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
-            { return NuevoNodo('Bloque', { sentencias }) }
+            {return NuevoNodo('Bloque', { sentencias }) }
+
+SWITCH = "switch" _ "(" _ condicion:EXPRESION _ ")" _ "{" _ cases:SWITCHCASE* default1:DEFAULTCASE? _ "}" 
+            {return NuevoNodo('Switch', { condicion, cases, default1 }) }
+
+SWITCHCASE = _ "case" _ valor:EXPRESION _ ":" _ bloquecase:INSTRUCCIONES* 
+            {return { valor, bloquecase } }
+
+DEFAULTCASE = _ "default" _ ":" _ sentencias:SENTENCIA* 
+            {return { sentencias } }
+
+
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', { id, asignacion }) }

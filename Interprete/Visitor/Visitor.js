@@ -51,6 +51,9 @@
 
  * @typedef {import('../Nodo/Nodos.js').While} While
 
+
+ * @typedef {import('../Nodo/Nodos.js').Switch} Switch
+
  */
 
 
@@ -211,6 +214,15 @@ export class BaseVisitor {
      */
     visitWhile(node) {
         throw new Error('Metodo visitWhile no implementado');
+    }
+    
+
+    /**
+     * @param {Switch} node
+     * @returns {any}
+     */
+    visitSwitch(node) {
+        throw new Error('Metodo visitSwitch no implementado');
     }
     
 }
