@@ -120,12 +120,18 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitBloque']}
     */
     visitBloque(node) {
+        const EntornoAnterior = this.entornoActual;
+        this.entornoActual = new Entorno(EntornoAnterior);
+        node.sentencias.forEach(sentencias => sentencias.accept(this));
+        this.entornoActual = EntornoAnterior;
     }
 
     /**
     * @type {BaseVisitor['visitIf']}
     */
     visitIf(node) {
+        const IfHandler1 = new IfHandler(node.condicion, node.sentenciasVerdadero, node.sentenciasFalso, this);
+        IfHandler1.EjecutarHandler();
     }
 
     /**

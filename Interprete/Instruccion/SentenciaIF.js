@@ -13,13 +13,16 @@ export class IfHandler {
     }
     EjecutarHandler() {
         const resultadoCondicion = this.condicion.accept(this.visitor);
-        if (typeof resultadoCondicion !== 'boolean') {
-            throw new Error('Error: La condición en una estructura if debe ser de tipo boolean.');
+        if (resultadoCondicion.tipo !== 'boolean') {
+            throw new Error('Error: La Condición En Una Estructura If Debe Ser De Tipo Boolean.');
         }
-        if (resultadoCondicion) {
+        if (resultadoCondicion.valor) {
             this.sentenciasVerdadero.accept(this.visitor);
-        } else if (this.sentenciasFalso) {
+            return { valor: this.sentenciasVerdadero.valor}
+        }
+        if (this.sentenciasFalso) {
             this.sentenciasFalso.accept(this.visitor);
+            return { valor: this.sentenciasFalso.valor}
         }
     }
 }

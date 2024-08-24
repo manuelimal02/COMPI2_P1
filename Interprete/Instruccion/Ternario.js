@@ -15,7 +15,7 @@ export class TernarioHandler {
     EjecutarHandler() {
         const resultadoCondicion = this.condicion.accept(this.visitor);
         if (resultadoCondicion.tipo !== 'boolean') {
-            throw new Error('Error: La condición en una expresión ternaria debe ser de tipo boolean.');
+            throw new Error('Error: La Condición En Una Expresión Ternaria Debe Ser De Tipo Boolean.');
         }
         if (resultadoCondicion.valor) {
             return  this.verdadero.accept(this.visitor);
