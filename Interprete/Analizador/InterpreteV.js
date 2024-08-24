@@ -83,8 +83,8 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitReferenciaVariable']}
     */
     visitReferenciaVariable(node) {
-        const NombreVar = node.id;
-        return this.entornoActual.getVariable(NombreVar).valor;
+        const variable = this.entornoActual.getVariable(node.id);
+        return variable.valor;
     }
 
     /**
@@ -92,7 +92,7 @@ export class Interprete extends BaseVisitor {
     */
     visitPrint(node) {
         const valor = node.expresion.accept(this).valor;
-        this.salida += valor + '\n';
+        this.salida += valor+ '\n';
     }
 
     /**
@@ -105,6 +105,9 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitAsignacion']}
     */
     visitAsignacion(node) {
+        const valor = node.asignacion.accept(this);
+        this.entornoActual.assignVariable(node.id, valor);
+        return  valor;
     }
 
     /**

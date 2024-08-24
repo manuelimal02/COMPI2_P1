@@ -45,7 +45,11 @@ export class Entorno {
             if (variable.tipo === "int" && valor.tipo !== "int") {
                 throw new Error(`El Tipo De La variable "${nombre}" Es "int". No Coincide Con El Tipo Del Valor Asignado.`);
             }
-            if (variable.tipo === "float" && (valor.tipo !== "float" && valor.tipo !== "int")) {
+            if (variable.tipo === "float" && valor.tipo === "int") {
+                valor.valor = parseFloat(valor.valor);
+                valor.tipo = 'float';
+            }
+            if (variable.tipo === "float" && valor.tipo !== "float") {
                 throw new Error(`El Tipo De La variable "${nombre}" Es "float". No Coincide Con El Tipo Del Valor Asignado.`);
             }
             if (variable.tipo === "char" && valor.tipo !== "char") {
@@ -54,7 +58,7 @@ export class Entorno {
             if (variable.tipo === "boolean" && valor.tipo !== "boolean") {
                 throw new Error(`El Tipo De La variable "${nombre}" Es "boolean". No Coincide Con El Tipo Del Valor Asignado.`);
             }
-            this.valores[nombre].valor = valor.valor;
+            this.valores[nombre].valor = {valor: valor.valor, tipo: valor.tipo};
             this.valores[nombre].tipo = valor.tipo; 
             return;
         }
