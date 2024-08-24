@@ -4,6 +4,7 @@ import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
 import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
+import { SwitchHandler } from "../Instruccion/Switch.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -143,6 +144,9 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitSwitch']}
     */
     visitSwitch(node) {
+        const switchHandler1 = new SwitchHandler(node.condicion, node.cases, node.default1, this);
+        switchHandler1.EjecutarHandler();
+        
     }
 
     /**
