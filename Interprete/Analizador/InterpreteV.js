@@ -146,6 +146,7 @@ export class Interprete extends BaseVisitor {
     /**
     * @type {BaseVisitor['visitPrint']}
     */
+    
     visitPrint(node) {
         const valores = node.expresion.map(expresion => expresion.accept(this).valor);
         this.salida += valores.join(' ') + '\n';
@@ -325,6 +326,7 @@ export class Interprete extends BaseVisitor {
         }
         return funcion.invocar(this, argumentos);
     }
+
     /**
      * @type {BaseVisitor['visitEmbebida']}
      */ 
@@ -350,5 +352,75 @@ export class Interprete extends BaseVisitor {
             case 'toString':
                 return {valor: expresion.valor.toString(), tipo: "string"};
         }
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionArreglo1']}
+     */ 
+    visitDeclaracionArreglo1(node) {
+        let arreglo = [];
+        const valoresEvaluados = node.valores.map(valor => valor.accept(this));
+        for (let valor of valoresEvaluados) {
+            if (valor.tipo !== node.tipo) {
+                throw new Error(`El Tipo Del Valor "${valor.valor}" No Coincide Con El Tipo Del Arreglo "${node.tipo}".`);
+            }
+            arreglo.push(valor.valor);
+        }
+        this.entornoActual.setVariable(node.tipo, node.id, arreglo);
+        console.log(this.entornoActual);
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionArreglo2']}
+     */ 
+    visitDeclaracionArreglo2(node) {
+        const numero = node.numero.accept(this);
+        let arreglo = [];
+        if (node.tipo1 !== node.tipo2) {
+            throw new Error(`El Tipo Del Arreglo "${node.tipo1}" No Coincide Con El Tipo Del Arreglo "${node.tipo2}".`);
+        }
+        
+        if (numero.tipo !== 'int') {
+            throw new Error(`El Tamaño Del Arreglo Debe Ser De Tipo Int: "${numero.tipo}".`);
+        }
+        if (numero.valor < 0) {
+            throw new Error(`El Tamaño Del Arreglo No Puede Ser Negativo: "${numero.valor}".`);
+        }
+        switch (node.tipo1) {
+            case 'int':
+                arreglo = Array(numero.valor).fill(0);
+                break;
+            case 'float':
+                arreglo = Array(numero.valor).fill(0.0);
+                break;
+            case 'string':
+                arreglo = Array(numero.valor).fill('');
+                break;
+            case 'char':
+                arreglo = Array(numero.valor).fill('\0');
+                break;
+            case 'boolean':
+                arreglo = Array(numero.valor).fill(false);
+                break;
+            default:
+                throw new Error(`Tipo De Arreglo No Válido: "${node.tipo1}".`);
+        }
+        this.entornoActual.setVariable(node.tipo1, node.id, arreglo);
+        console.log(this.entornoActual);
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionArreglo3']}
+     */ 
+    visitDeclaracionArreglo3(node) {
+        const valores = this.entornoActual.getVariable(node.id2);
+        if (!Array.isArray(valores.valor)) {
+            throw new Error(`La Variable "${node.id2}" No Es Un Arreglo.`);
+        }
+        if (valores.tipo !== node.tipo) {
+            throw new Error(`El Tipo Del Arreglo "${valores.tipo}" No Coincide Con El Tipo Del Arreglo "${node.tipo}".`);
+        }
+        this.entornoActual.setVariable(node.tipo, node.id1, valores.valor);
+        console.log(this.entornoActual);
     }
 }    

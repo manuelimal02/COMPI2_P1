@@ -38,7 +38,7 @@ export class DeclaracionVariableHandler {
             case 'int': return {valor: 0, tipo: 'int'};
             case 'float': return {valor: 0.0, tipo: 'float'};
             case 'string': return {valor: '', tipo: 'string'};
-            case 'bool': return {valor: true, tipo: 'bool'};
+            case 'boolean': return {valor: true, tipo: 'boolean'};
             case 'char': return {valor: '\0', tipo: 'char'};
             case 'var': return {valor: null, tipo: 'var'};
             default: throw new Error(`Tipo De Variable: "${tipo}" No Válido.`);

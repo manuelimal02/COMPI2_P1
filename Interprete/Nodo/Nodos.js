@@ -788,4 +788,168 @@ export class Embebida extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida }
+export class DeclaracionArreglo1 extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de los elementos del arreglo
+ * @param {Expresion} options.id Identificador del arreglo
+ * @param {Expresion} options.valores Valores del arreglo
+    */
+    constructor({ tipo, id, valores }) {
+        super();
+        
+        /**
+         * Tipo de los elementos del arreglo
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Valores del arreglo
+         * @type {Expresion}
+        */
+        this.valores = valores;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionArreglo1(this);
+    }
+}
+    
+export class DeclaracionArreglo2 extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo1 Tipo de los elementos del arreglo
+ * @param {Expresion} options.id Identificador del arreglo
+ * @param {string} options.tipo2 Tipo de los elementos del arreglo
+ * @param {Expresion} options.numero Tamaño del arreglo
+    */
+    constructor({ tipo1, id, tipo2, numero }) {
+        super();
+        
+        /**
+         * Tipo de los elementos del arreglo
+         * @type {string}
+        */
+        this.tipo1 = tipo1;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Tipo de los elementos del arreglo
+         * @type {string}
+        */
+        this.tipo2 = tipo2;
+
+
+        /**
+         * Tamaño del arreglo
+         * @type {Expresion}
+        */
+        this.numero = numero;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionArreglo2(this);
+    }
+}
+    
+export class DeclaracionArreglo3 extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de los elementos del arreglo
+ * @param {Expresion} options.id1 Identificador del arreglo
+ * @param {string} options.id2 Valor del arreglo
+    */
+    constructor({ tipo, id1, id2 }) {
+        super();
+        
+        /**
+         * Tipo de los elementos del arreglo
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {Expresion}
+        */
+        this.id1 = id1;
+
+
+        /**
+         * Valor del arreglo
+         * @type {string}
+        */
+        this.id2 = id2;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionArreglo3(this);
+    }
+}
+    
+export class IndexArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador del arreglo
+ * @param {Expresion} options.index Indice a buscar
+    */
+    constructor({ id, index }) {
+        super();
+        
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Indice a buscar
+         * @type {Expresion}
+        */
+        this.index = index;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitIndexArreglo(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo }

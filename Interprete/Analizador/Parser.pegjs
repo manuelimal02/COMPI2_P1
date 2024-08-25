@@ -23,7 +23,11 @@
         'Continue': Nodos.Continue,
         'Return': Nodos.Return,
         'Llamada': Nodos.Llamada, 
-        'Embebida': Nodos.Embebida
+        'Embebida': Nodos.Embebida,
+        'DeclaracionArreglo1': Nodos.DeclaracionArreglo1,
+        'DeclaracionArreglo2': Nodos.DeclaracionArreglo2,
+        'DeclaracionArreglo3': Nodos.DeclaracionArreglo3,
+        'IndexArreglo': Nodos.IndexArreglo
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -43,6 +47,21 @@ DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id, expresion })}
             / tipo:TIPO _ id:IDENTIFICADOR _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
+            /arreglo:ARREGLO
+            {return arreglo}
+
+ARREGLO = tipo:TIPO _ "[]" _ id:IDENTIFICADOR _ "=" _ valores:VALORES _ ";" 
+            {return NuevoNodo('DeclaracionArreglo1', {tipo, id, valores})}
+        /tipo1:TIPO _ "[]" _ id:IDENTIFICADOR _ "=" _ "new" _ tipo2:TIPO _ "[" _ numero:EXPRESION _ "]" _ ";" 
+            {return NuevoNodo('DeclaracionArreglo2', {tipo1, id, tipo2, numero})}
+        /tipo:TIPO _ "[]" _ id1:IDENTIFICADOR _ "=" _ id2:IDENTIFICADOR _ ";" 
+            {return NuevoNodo('DeclaracionArreglo3', {tipo, id1, id2})}
+
+VALORES = "{" _ valores:LISTAVALORES _ "}" 
+            {return valores}
+
+LISTAVALORES = expresion1:EXPRESION _ valores:("," _ expresion:EXPRESION {return expresion})* 
+            {return [expresion1, ...valores]}
 
 SENTENCIA =  if_1:IF
             {return if_1}
@@ -70,9 +89,6 @@ IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA
             _ "else" _ sentenciasFalso:SENTENCIA 
             { return sentenciasFalso } )? 
             { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
-
-//PRINT = "print(" _ expresion:EXPRESION _ ")" _ ";" _
-//            {return NuevoNodo('Print', { expresion })}
 
 PRINT = "print(" _ expresion:EXPRESIONES _ ")" _ ";" _
         {return NuevoNodo('Print', { expresion })}
@@ -234,6 +250,9 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
         / embe:("toString")"(" _ expresion:OTRAEXPRESION _ ")" _
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
+        //arr1.indexOf(20)
+        / id:IDENTIFICADOR _ ".indexOf" _ "(" _ expresion:OTRAEXPRESION _ ")" _
+            {return NuevoNodo('IndexArreglo', {id, expresion})}
         / LLLAMADA
 
 LLLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {

@@ -72,6 +72,18 @@
 
  * @typedef {import('../Nodo/Nodos.js').Embebida} Embebida
 
+
+ * @typedef {import('../Nodo/Nodos.js').DeclaracionArreglo1} DeclaracionArreglo1
+
+
+ * @typedef {import('../Nodo/Nodos.js').DeclaracionArreglo2} DeclaracionArreglo2
+
+
+ * @typedef {import('../Nodo/Nodos.js').DeclaracionArreglo3} DeclaracionArreglo3
+
+
+ * @typedef {import('../Nodo/Nodos.js').IndexArreglo} IndexArreglo
+
  */
 
 
@@ -295,6 +307,42 @@ export class BaseVisitor {
      */
     visitEmbebida(node) {
         throw new Error('Metodo visitEmbebida no implementado');
+    }
+    
+
+    /**
+     * @param {DeclaracionArreglo1} node
+     * @returns {any}
+     */
+    visitDeclaracionArreglo1(node) {
+        throw new Error('Metodo visitDeclaracionArreglo1 no implementado');
+    }
+    
+
+    /**
+     * @param {DeclaracionArreglo2} node
+     * @returns {any}
+     */
+    visitDeclaracionArreglo2(node) {
+        throw new Error('Metodo visitDeclaracionArreglo2 no implementado');
+    }
+    
+
+    /**
+     * @param {DeclaracionArreglo3} node
+     * @returns {any}
+     */
+    visitDeclaracionArreglo3(node) {
+        throw new Error('Metodo visitDeclaracionArreglo3 no implementado');
+    }
+    
+
+    /**
+     * @param {IndexArreglo} node
+     * @returns {any}
+     */
+    visitIndexArreglo(node) {
+        throw new Error('Metodo visitIndexArreglo no implementado');
     }
     
 }
