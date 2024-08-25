@@ -21,7 +21,9 @@
         'For': Nodos.For,
         'Break': Nodos.Break,
         'Continue': Nodos.Continue,
-        'Return': Nodos.Return
+        'Return': Nodos.Return,
+        'Llamada': Nodos.Llamada, 
+        'Embebida': Nodos.Embebida
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -69,8 +71,18 @@ IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA
             { return sentenciasFalso } )? 
             { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
 
-PRINT = "print(" _ expresion:EXPRESION _ ")" _ ";" _
-            {return NuevoNodo('Print', { expresion })}
+//PRINT = "print(" _ expresion:EXPRESION _ ")" _ ";" _
+//            {return NuevoNodo('Print', { expresion })}
+
+PRINT = "print(" _ expresion:EXPRESIONES _ ")" _ ";" _
+        {return NuevoNodo('Print', { expresion })}
+
+EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)* 
+        {
+            const expresiones = [primera];
+            resto.forEach(([ , , , exp]) => expresiones.push(exp));
+            return expresiones;
+        }
 
 BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
             {return NuevoNodo('Bloque', { sentencias }) }
@@ -141,8 +153,6 @@ EXPRESION =  ternario:TERNARIO
             {return caracter}
             / cadena:CADENA
             {return cadena}
-
-Typeof = "typeof" _ exp:EXPRESION _ {return NuevoNodo('tipoOf', {exp})}
 
 TERNARIO =  condicion:LOGICO _ "?" _ verdadero:LOGICO _ ":"_ falso:LOGICO _ 
             { return NuevoNodo('ternario', {condicion, verdadero, falso }) }
@@ -216,11 +226,28 @@ MULTIPLICACION = izquierda:UNARIA expansion:( _ operador:("*" / "/" / "%") _ der
     )
 }
 
-UNARIA = "-" _ expresion:OTRAEXPRESION 
+UNARIA = "-" _ expresion:UNARIA 
             {return NuevoNodo('OperacionUnaria', {operador: '-', expresion: expresion})}
-        / "!" _ expresion:OTRAEXPRESION 
+        / "!" _ expresion:UNARIA 
             {return NuevoNodo('OperacionUnaria', {operador: '!', expresion: expresion})}
-        / OTRAEXPRESION
+        / embe:("typeof") _ expresion:OTRAEXPRESION 
+            {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
+        / embe:("toString")"(" _ expresion:OTRAEXPRESION _ ")" _
+            {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
+        / LLLAMADA
+
+LLLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
+    return parametros.reduce(
+        (callee, argumentos) => {
+            return NuevoNodo('Llamada', { callee, argumentos: argumentos || [] })
+            },
+    callee
+    )
+}
+
+ARGUMENTOS = argumento:EXPRESION _ argumentos:("," _ expresion:EXPRESION 
+{ return expresion })* 
+{ return [argumento, ...argumentos] }
 
 OTRAEXPRESION = decimal:DECIMAL
             {return decimal}

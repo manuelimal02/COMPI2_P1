@@ -66,6 +66,12 @@
 
  * @typedef {import('../Nodo/Nodos.js').Return} Return
 
+
+ * @typedef {import('../Nodo/Nodos.js').Llamada} Llamada
+
+
+ * @typedef {import('../Nodo/Nodos.js').Embebida} Embebida
+
  */
 
 
@@ -271,6 +277,24 @@ export class BaseVisitor {
      */
     visitReturn(node) {
         throw new Error('Metodo visitReturn no implementado');
+    }
+    
+
+    /**
+     * @param {Llamada} node
+     * @returns {any}
+     */
+    visitLlamada(node) {
+        throw new Error('Metodo visitLlamada no implementado');
+    }
+    
+
+    /**
+     * @param {Embebida} node
+     * @returns {any}
+     */
+    visitEmbebida(node) {
+        throw new Error('Metodo visitEmbebida no implementado');
     }
     
 }

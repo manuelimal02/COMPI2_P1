@@ -722,4 +722,70 @@ export class Return extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return }
+export class Llamada extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {Expresion} options.callee Expresion a llamar
+ * @param {Expresion[]} options.argumentos Argumentos de la llamada
+    */
+    constructor({ callee, argumentos }) {
+        super();
+        
+        /**
+         * Expresion a llamar
+         * @type {Expresion}
+        */
+        this.callee = callee;
+
+
+        /**
+         * Argumentos de la llamada
+         * @type {Expresion[]}
+        */
+        this.argumentos = argumentos;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitLlamada(this);
+    }
+}
+    
+export class Embebida extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.Nombre Nombre de la funcion embebida
+ * @param {Expresion} options.Argumento Argumentos de la llamada
+    */
+    constructor({ Nombre, Argumento }) {
+        super();
+        
+        /**
+         * Nombre de la funcion embebida
+         * @type {string}
+        */
+        this.Nombre = Nombre;
+
+
+        /**
+         * Argumentos de la llamada
+         * @type {Expresion}
+        */
+        this.Argumento = Argumento;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitEmbebida(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida }

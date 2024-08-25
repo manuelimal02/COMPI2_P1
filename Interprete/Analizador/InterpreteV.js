@@ -5,6 +5,8 @@ import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
 import { Expresion } from "../Nodo/Nodos.js";
+import { Embebidas } from "../Instruccion/Embebida.js";
+import { Invocable } from "../Instruccion/Invocable.js";
 import { BreakException, ContinueException, ReturnException } from "../Instruccion/Transferencia.js";
 import Nodos from "../Nodo/Nodos.js";
 
@@ -15,6 +17,9 @@ export class Interprete extends BaseVisitor {
         this.entornoActual = new Entorno();
         this.salida = '';
 
+        Object.entries(Embebidas).forEach(([nombre, funcion]) => {
+            this.entornoActual.setVariable('funcion', nombre, funcion);
+        });
         /**
          * @type {Expresion | null}
          */
@@ -142,8 +147,8 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitPrint']}
     */
     visitPrint(node) {
-        const valor = node.expresion.accept(this).valor;
-        this.salida += valor+ '\n';
+        const valores = node.expresion.map(expresion => expresion.accept(this).valor);
+        this.salida += valores.join(' ') + '\n';
     }
 
     /**
@@ -304,5 +309,46 @@ export class Interprete extends BaseVisitor {
             Valor = node.expresion.accept(this);
         }
         throw new ReturnException(Valor);
+    }
+
+    /**
+     * @type {BaseVisitor['visitLlamada']}
+     */
+    visitLlamada(node) {
+        const funcion = node.callee.accept(this);
+        const argumentos = node.argumentos.map(arg => arg.accept(this));
+        if (!(funcion instanceof Invocable)) {
+            throw new Error(`La variable "${node.callee.id}" no es invocable`);
+        }
+        if (funcion.aridad() !== argumentos.length) {
+            throw new Error(`La función espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}`);
+        }
+        return funcion.invocar(this, argumentos);
+    }
+    /**
+     * @type {BaseVisitor['visitEmbebida']}
+     */ 
+    visitEmbebida(node) {
+        const expresion = node.Argumento.accept(this);
+        const NombreFuncion = node.Nombre;
+        switch (NombreFuncion) {
+            case 'typeof':
+                switch (expresion.tipo) {
+                    case "int":
+                        return {valor: expresion.tipo, tipo: "string" };
+                    case "float":
+                        return {valor: expresion.tipo, tipo: "string" };
+                    case "string": 
+                        return {valor: expresion.tipo, tipo: "string" };
+                    case "char":
+                        return {valor: expresion.tipo, tipo: "string" };
+                    case "boolean": 
+                        return {valor: expresion.tipo, tipo: "string" };    
+                    default:
+                        throw new Error(`El Argumento De typeof Es Tipo Desconocido: "${arg.tipo}".`);
+                    }
+            case 'toString':
+                return {valor: expresion.valor.toString(), tipo: "string"};
+        }
     }
 }    
