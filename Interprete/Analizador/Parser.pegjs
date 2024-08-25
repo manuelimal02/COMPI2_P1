@@ -18,7 +18,10 @@
         'If': Nodos.If,
         'While': Nodos.While,
         'Switch': Nodos.Switch,
-        'For': Nodos.For
+        'For': Nodos.For,
+        'Break': Nodos.Break,
+        'Continue': Nodos.Continue,
+        'Return': Nodos.Return
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -53,6 +56,12 @@ SENTENCIA =  if_1:IF
             {return while_s}
             /for_s:FOR
             {return for_s}
+            /break_s:BREAK
+            {return break_s}
+            /continue_s:CONTUNUE
+            {return continue_s}
+            /return_s:RETURN
+            {return return_s}
 
 IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -78,18 +87,34 @@ DEFAULTCASE = _ "default" _ ":" _ sentencias:SENTENCIA*
 WHILE = _ "while" _ "(" _ condicion:EXPRESION _ ")" _ sentencias:BLOQUE 
             {return NuevoNodo('While', { condicion, sentencias }) }
 
-FOR = "for" _ "("_ declaracion:DECLARACION _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
+FOR = "for" _ "("_ declaracion:FORINIT _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
             {return NuevoNodo('For', { declaracion, condicion, incremento, sentencia }) }
+
+FORINIT = declaracion:DECLARACION 
+            {return declaracion}
+            / expresion:EXPRESION _ ";" _
+            {return expresion}
+            / ";" _
+            {return null}
+
+BREAK = "break" _ ";" _ 
+            {return NuevoNodo('Break')}
+
+CONTUNUE = "continue" _ ";" _ 
+            {return NuevoNodo('Continue')}
+
+RETURN = "return" _ expresion:EXPRESION? _ ";" _ 
+            {return NuevoNodo('Return', {expresion})}
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', { id, asignacion }) }
 
-            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ 
+            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', 
             { id, asignacion: NuevoNodo('OperacionBinaria', 
             { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }
 
-            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
+            /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ 
             { return NuevoNodo('asignacion', 
             { id, asignacion: NuevoNodo('OperacionBinaria', 
             { operador, izquierda: NuevoNodo('ReferenciaVariable', { id }) , derecha: expresion }) }) }

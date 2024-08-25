@@ -110,8 +110,8 @@ export function FuncionInterprete() {
             sentencias.forEach(sentencia => sentencia.accept(interprete));
             salida.value = interprete.salida;
         } catch (error) {
-            salida.value = "Error: " + error.message;
-            console.error("Error Al Ejecutar:", error);
+            salida.innerHTML = "Error: "+ error.message;
+            console.error("Error:", error);
             UltimoAST = null;
         }
         ActualizarNumeroLinea(salida, LNSalida);

@@ -57,6 +57,15 @@
 
  * @typedef {import('../Nodo/Nodos.js').For} For
 
+
+ * @typedef {import('../Nodo/Nodos.js').Break} Break
+
+
+ * @typedef {import('../Nodo/Nodos.js').Continue} Continue
+
+
+ * @typedef {import('../Nodo/Nodos.js').Return} Return
+
  */
 
 
@@ -235,6 +244,33 @@ export class BaseVisitor {
      */
     visitFor(node) {
         throw new Error('Metodo visitFor no implementado');
+    }
+    
+
+    /**
+     * @param {Break} node
+     * @returns {any}
+     */
+    visitBreak(node) {
+        throw new Error('Metodo visitBreak no implementado');
+    }
+    
+
+    /**
+     * @param {Continue} node
+     * @returns {any}
+     */
+    visitContinue(node) {
+        throw new Error('Metodo visitContinue no implementado');
+    }
+    
+
+    /**
+     * @param {Return} node
+     * @returns {any}
+     */
+    visitReturn(node) {
+        throw new Error('Metodo visitReturn no implementado');
     }
     
 }

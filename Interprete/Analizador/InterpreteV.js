@@ -5,7 +5,9 @@ import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
 import { SwitchHandler } from "../Instruccion/Switch.js";
-import { WhileHandler } from "../Instruccion/While.js";
+import { Expresion } from "../Nodo/Nodos.js";
+import { BreakException, ContinueException, ReturnException } from "../Instruccion/Transferencia.js";
+import Nodos from "../Nodo/Nodos.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -13,6 +15,11 @@ export class Interprete extends BaseVisitor {
         super();
         this.entornoActual = new Entorno();
         this.salida = '';
+
+        /**
+         * @type {Expresion | null}
+         */
+        this.PrevContinue = null;
     }
 
     interpretar(nodo) {
@@ -179,12 +186,25 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitWhile']}
     */
     visitWhile(node) {
+        const EntornoInicial = this.entornoActual;
         const condicion = node.condicion.accept(this);
         if (condicion.tipo !== 'boolean') {
             throw new Error('Error: La Condición En Una Estructura While Debe Ser De Tipo Boolean.');
         }
-        const whileHandler1 = new WhileHandler(node.condicion, node.sentencias, this);
-        whileHandler1.EjecutarHandler();
+        try {
+            while (node.condicion.accept(this).valor) {
+                node.sentencias.accept(this);
+            }
+        } catch (error) {
+            this.entornoActual = EntornoInicial;
+            if (error instanceof BreakException) {
+                return
+            }
+            if (error instanceof ContinueException) {
+                return this.visitWhile(node);
+            }
+            throw error;
+        }
     }
     /**
     * @type {BaseVisitor['visitSwitch']}
@@ -199,25 +219,71 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitFor']}
     */
     visitFor(node) {
-        const entornoAnterior = this.entornoActual;
-        this.entornoActual = new Entorno(entornoAnterior);
-        node.declaracion.accept(this);
-        let resultado = null;
-        while (true) {
-            const condicion = node.condicion.accept(this);
-            if (condicion.tipo !== 'boolean') {
-                throw new Error('Error: La Condición En Una Estructura For Debe Ser De Tipo Boolean.');
-            }
-            if (!condicion.valor) {
-                break;
-            }
-            const resultadoBloque = node.sentencia.accept(this);
-            if (resultadoBloque) {
-                resultado = resultadoBloque.valor;
-            }
-            node.incremento.accept(this);
+        const PrevIncremento = this.PrevContinue;
+        this.PrevContinue = node.incremento;
+        const ImplementacionFor = new Nodos.Bloque({
+            sentencias: [
+                node.declaracion,
+                new Nodos.While({
+                    condicion: node.condicion,
+                    sentencias: new Nodos.Bloque({
+                        sentencias: [
+                            node.sentencia,
+                            node.incremento
+                        ]
+                    })
+                })
+            ]
+        })
+        ImplementacionFor.accept(this);
+        this.PrevContinue = PrevIncremento;
+        //const entornoAnterior = this.entornoActual;
+        //this.entornoActual = new Entorno(entornoAnterior);
+        //node.declaracion.accept(this);
+        //let resultado = null;
+        //while (true) {
+        //    const condicion = node.condicion.accept(this);
+        //    if (condicion.tipo !== 'boolean') {
+        //        throw new Error('Error: La Condición En Una Estructura For Debe Ser De Tipo Boolean.');
+        //    }
+        //    if (!condicion.valor) {
+        //        break;
+        //    }
+        //    const resultadoBloque = node.sentencia.accept(this);
+        //    if (resultadoBloque) {
+        //        resultado = resultadoBloque.valor;
+        //    }
+        //    node.incremento.accept(this);
+        //}
+        //this.entornoActual = entornoAnterior;
+        //return { valor: resultado };
+    }
+
+    /**
+    * @type {BaseVisitor['visitBreak']}
+    */
+    visitBreak(node) {
+        throw new BreakException();
+    }
+    
+    /**
+    * @type {BaseVisitor['visitContinue']}
+    */
+    visitContinue(node) {
+        if (this.PrevContinue) {
+            this.PrevContinue.accept(this);
         }
-        this.entornoActual = entornoAnterior;
-        return { valor: resultado };
+        throw new ContinueException();
+    }
+    
+    /**
+    * @type {BaseVisitor['visitReturn']}
+    */
+    visitReturn(node) {
+        let Valor = null;
+        if(node.expresion){
+            Valor = node.expresion.accept(this);
+        }
+        throw new ReturnException(Valor);
     }
 }    
