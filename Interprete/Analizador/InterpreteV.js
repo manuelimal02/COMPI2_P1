@@ -4,7 +4,6 @@ import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
 import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
-import { SwitchHandler } from "../Instruccion/Switch.js";
 import { Expresion } from "../Nodo/Nodos.js";
 import { BreakException, ContinueException, ReturnException } from "../Instruccion/Transferencia.js";
 import Nodos from "../Nodo/Nodos.js";
@@ -210,9 +209,49 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitSwitch']}
     */
     visitSwitch(node) {
-        const switchHandler1 = new SwitchHandler(node.condicion, node.cases, node.default1, this);
-        switchHandler1.EjecutarHandler();
-        
+        const EntoronoInicial = this.entornoActual;
+        let CasoEncontrado = false;
+        try {
+            for (const caso of node.cases) {
+                if (!CasoEncontrado && caso.valor.accept(this).valor === node.condicion.accept(this).valor) {
+                    CasoEncontrado = true;
+                }
+                if (CasoEncontrado) {
+                    this.entornoActual = new Entorno(EntoronoInicial);
+                    for (const SentenciasBloque of caso.bloquecase) {
+                        try {
+                            SentenciasBloque.accept(this);
+                        } catch (error) {
+                            if (error instanceof BreakException) {
+                                return;
+                            } else if (error instanceof ContinueException) {
+                                break;
+                            } else {
+                                throw error;
+                            }
+                        }
+                    }
+                }
+            }
+            if (!CasoEncontrado && node.default1) {
+                this.entornoActual = new Entorno(EntoronoInicial);
+                for (const SentenciasBloque of node.default1.sentencias) {
+                    try {
+                        SentenciasBloque.accept(this);
+                    } catch (error) {
+                        if (error instanceof BreakException) {
+                            return;
+                        } else if (error instanceof ContinueException) {
+                            break;
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+            }
+        } finally {
+        this.entornoActual = EntoronoInicial;
+        }
     }
 
     /**
@@ -237,26 +276,6 @@ export class Interprete extends BaseVisitor {
         })
         ImplementacionFor.accept(this);
         this.PrevContinue = PrevIncremento;
-        //const entornoAnterior = this.entornoActual;
-        //this.entornoActual = new Entorno(entornoAnterior);
-        //node.declaracion.accept(this);
-        //let resultado = null;
-        //while (true) {
-        //    const condicion = node.condicion.accept(this);
-        //    if (condicion.tipo !== 'boolean') {
-        //        throw new Error('Error: La Condición En Una Estructura For Debe Ser De Tipo Boolean.');
-        //    }
-        //    if (!condicion.valor) {
-        //        break;
-        //    }
-        //    const resultadoBloque = node.sentencia.accept(this);
-        //    if (resultadoBloque) {
-        //        resultado = resultadoBloque.valor;
-        //    }
-        //    node.incremento.accept(this);
-        //}
-        //this.entornoActual = entornoAnterior;
-        //return { valor: resultado };
     }
 
     /**
