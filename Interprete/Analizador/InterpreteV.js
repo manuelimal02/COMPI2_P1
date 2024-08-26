@@ -131,7 +131,6 @@ export class Interprete extends BaseVisitor {
     visitDeclaracionVar(node) {
         const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, this);
         DeclaracionHandler.EjecutarHandler();
-        console.log(this.entornoActual);
     }
     
 
@@ -148,7 +147,14 @@ export class Interprete extends BaseVisitor {
     */
     
     visitPrint(node) {
-        const valores = node.expresion.map(expresion => expresion.accept(this).valor);
+        const valores = node.expresion.map(expresion => {
+            const resultado = expresion.accept(this);
+            if (Array.isArray(resultado)) {
+                return resultado;
+            } else {
+                return resultado.valor;
+            }
+        });
         this.salida += valores.join(' ') + '\n';
     }
 
@@ -367,7 +373,6 @@ export class Interprete extends BaseVisitor {
             arreglo.push(valor.valor);
         }
         this.entornoActual.setVariable(node.tipo, node.id, arreglo);
-        console.log(this.entornoActual);
     }
 
     /**
@@ -406,7 +411,6 @@ export class Interprete extends BaseVisitor {
                 throw new Error(`Tipo De Arreglo No Válido: "${node.tipo1}".`);
         }
         this.entornoActual.setVariable(node.tipo1, node.id, arreglo);
-        console.log(this.entornoActual);
     }
 
     /**
@@ -420,8 +424,7 @@ export class Interprete extends BaseVisitor {
         if (valores.tipo !== node.tipo) {
             throw new Error(`El Tipo Del Arreglo "${valores.tipo}" No Coincide Con El Tipo Del Arreglo "${node.tipo}".`);
         }
-        this.entornoActual.setVariable(node.tipo, node.id1, valores.valor);
-        console.log(this.entornoActual);
+        this.entornoActual.setVariable(node.tipo, node.id1, valores.valor.slice());
     }
 
     /**
@@ -491,5 +494,28 @@ export class Interprete extends BaseVisitor {
             }
         }
         throw new Error(`Indice Fuera De Rango: "${index.valor}".`);
+    }
+
+    /**
+     * @type {BaseVisitor['visitAsignacionArreglo']}
+     */
+    visitAsignacionArreglo(node) {
+        const arreglo = this.entornoActual.getVariable(node.id);
+        const index = node.index.accept(this);
+        const valor = node.valor.accept(this);
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        }
+        if (index.tipo !== 'int') {
+            throw new Error(`El Indice De Acceso Al Arreglo Debe Ser De Tipo Int: "${index.tipo}".`);
+        }
+        if (valor.tipo !== arreglo.tipo) {
+            throw new Error(`El Tipo Del Valor "${valor.valor}" No Coincide Con El Tipo Del Arreglo "${arreglo.tipo}".`);
+        }
+        if (index.valor < 0 || index.valor >= arreglo.valor.length) {
+            throw new Error(`Indice Fuera De Rango: "${index.valor}".`);
+        }
+        arreglo.valor[index.valor] = valor.valor;
+        return;
     }
 }    

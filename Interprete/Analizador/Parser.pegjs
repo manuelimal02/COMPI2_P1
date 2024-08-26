@@ -30,7 +30,7 @@
         'IndexArreglo': Nodos.IndexArreglo,
         'JoinArreglo': Nodos.JoinArreglo,
         'LengthArreglo': Nodos.LengthArreglo,
-        'AccesoArreglo': Nodos.AccesoArreglo.
+        'AccesoArreglo': Nodos.AccesoArreglo,
         'AsignacionArreglo': Nodos.AsignacionArreglo
     }
     const nodo = new tipos[TipoNodo](props)
@@ -164,7 +164,7 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
             { operador, expresion: NuevoNodo('ReferenciaVariable', { id }) }) }) }
 
 ASIGNACIONARREGLO = id:IDENTIFICADOR _ "[" _ index:EXPRESION _ "]" _ "=" _ valor:EXPRESION _ ";" _ 
-            { return NuevoNodo('AsignacionArreglo', { id, index, valor }) }
+            {return NuevoNodo('AsignacionArreglo', { id, index, valor })}
 
 EXPRESION =  ternario:TERNARIO
             {return ternario}
