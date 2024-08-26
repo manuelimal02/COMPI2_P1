@@ -90,6 +90,9 @@
 
  * @typedef {import('../Nodo/Nodos.js').LengthArreglo} LengthArreglo
 
+
+ * @typedef {import('../Nodo/Nodos.js').AccesoArreglo} AccesoArreglo
+
  */
 
 
@@ -367,6 +370,15 @@ export class BaseVisitor {
      */
     visitLengthArreglo(node) {
         throw new Error('Metodo visitLengthArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {AccesoArreglo} node
+     * @returns {any}
+     */
+    visitAccesoArreglo(node) {
+        throw new Error('Metodo visitAccesoArreglo no implementado');
     }
     
 }

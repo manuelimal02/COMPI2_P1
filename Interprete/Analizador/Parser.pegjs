@@ -30,7 +30,8 @@
         'IndexArreglo': Nodos.IndexArreglo,
         'JoinArreglo': Nodos.JoinArreglo,
         'LengthArreglo': Nodos.LengthArreglo,
-        'AccesoArreglo': Nodos.AccesoArreglo
+        'AccesoArreglo': Nodos.AccesoArreglo.
+        'AsignacionArreglo': Nodos.AsignacionArreglo
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -74,6 +75,8 @@ SENTENCIA =  if_1:IF
             {return bloque}
             /asignacion:ASIGNACION
             {return asignacion}
+            /asignacionArreglo:ASIGNACIONARREGLO
+            {return asignacionArreglo}
             /switch_s:SWITCH
             {return switch_s}
             /while_s:WHILE
@@ -262,7 +265,6 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('JoinArreglo', {id})}
         / id:IDENTIFICADOR _ ".length"
             {return NuevoNodo('LengthArreglo', {id})}
-        //  arr1[3];
         / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
             {return NuevoNodo('AccesoArreglo', {id, index})}
         / LLLAMADA

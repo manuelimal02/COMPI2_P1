@@ -473,4 +473,23 @@ export class Interprete extends BaseVisitor {
         return {valor: arreglo.valor.length, tipo: "int"};
     }
     
+    /**
+     * @type {BaseVisitor['visitAccesoArreglo']}
+     */
+    visitAccesoArreglo(node) {
+        const arreglo = this.entornoActual.getVariable(node.id);
+        const index = node.index.accept(this)
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        }
+        if (index.tipo !== 'int') {
+            throw new Error(`El Indice De Acceso Al Arreglo Debe Ser De Tipo Int: "${index.tipo}".`);
+        }
+        for (let i = 0; i < arreglo.valor.length; i++) {
+            if (i === index.valor) {
+                return {valor: arreglo.valor[i], tipo: arreglo.tipo};
+            }
+        }
+        throw new Error(`Indice Fuera De Rango: "${index.valor}".`);
+    }
 }    
