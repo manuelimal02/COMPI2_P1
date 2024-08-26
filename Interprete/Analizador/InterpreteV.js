@@ -423,4 +423,54 @@ export class Interprete extends BaseVisitor {
         this.entornoActual.setVariable(node.tipo, node.id1, valores.valor);
         console.log(this.entornoActual);
     }
+
+    /**
+     * @type {BaseVisitor['visitIndexArreglo']}
+     */
+    visitIndexArreglo(node) {
+        const arreglo = this.entornoActual.getVariable(node.id);
+        const index = node.index.accept(this)
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        }
+        if (index.tipo!== arreglo.tipo){
+            throw new Error(`El Tipo Del Indice "${index.tipo}" No Coincide Con El Tipo Del Arreglo "${arreglo.tipo}".`);
+        }
+        for (let i = 0; i < arreglo.valor.length; i++) {
+            if (arreglo.valor[i] === index.valor) {
+                return {valor: i, tipo: "int"};
+            }
+        }
+        return {valor: -1, tipo:"int"};
+    }
+
+    /**
+     * @type {BaseVisitor['visitIndexArreglo']}
+     */
+    visitJoinArreglo(node) {
+        let cadena ="";
+        const arreglo = this.entornoActual.getVariable(node.id);
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        }
+        for (let i = 0; i < arreglo.valor.length; i++) {
+            cadena += arreglo.valor[i].toString();
+            if (i < arreglo.valor.length - 1) {
+                cadena += ",";
+            }
+        }
+        return {valor: cadena, tipo: "string"};
+    }
+
+    /**
+     * @type {BaseVisitor['visitLengthArreglo']}
+     */
+    visitLengthArreglo(node) {
+        const arreglo = this.entornoActual.getVariable(node.id);
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        }
+        return {valor: arreglo.valor.length, tipo: "int"};
+    }
+    
 }    

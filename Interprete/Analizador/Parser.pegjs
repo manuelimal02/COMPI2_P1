@@ -27,7 +27,10 @@
         'DeclaracionArreglo1': Nodos.DeclaracionArreglo1,
         'DeclaracionArreglo2': Nodos.DeclaracionArreglo2,
         'DeclaracionArreglo3': Nodos.DeclaracionArreglo3,
-        'IndexArreglo': Nodos.IndexArreglo
+        'IndexArreglo': Nodos.IndexArreglo,
+        'JoinArreglo': Nodos.JoinArreglo,
+        'LengthArreglo': Nodos.LengthArreglo,
+        'AccesoArreglo': Nodos.AccesoArreglo
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -157,6 +160,9 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
             { id, asignacion: NuevoNodo('OperacionUnaria', 
             { operador, expresion: NuevoNodo('ReferenciaVariable', { id }) }) }) }
 
+ASIGNACIONARREGLO = id:IDENTIFICADOR _ "[" _ index:EXPRESION _ "]" _ "=" _ valor:EXPRESION _ ";" _ 
+            { return NuevoNodo('AsignacionArreglo', { id, index, valor }) }
+
 EXPRESION =  ternario:TERNARIO
             {return ternario}
             /booleano:BOOLEANO
@@ -250,10 +256,17 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
         / embe:("toString")"(" _ expresion:OTRAEXPRESION _ ")" _
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
-        //arr1.indexOf(20)
-        / id:IDENTIFICADOR _ ".indexOf" _ "(" _ expresion:OTRAEXPRESION _ ")" _
-            {return NuevoNodo('IndexArreglo', {id, expresion})}
+        / id:IDENTIFICADOR _ ".indexOf" _ "(" _ index:OTRAEXPRESION _ ")"
+            {return NuevoNodo('IndexArreglo', {id, index})}
+        / id:IDENTIFICADOR _ ".join()"
+            {return NuevoNodo('JoinArreglo', {id})}
+        / id:IDENTIFICADOR _ ".length"
+            {return NuevoNodo('LengthArreglo', {id})}
+        //  arr1[3];
+        / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
+            {return NuevoNodo('AccesoArreglo', {id, index})}
         / LLLAMADA
+
 
 LLLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
     return parametros.reduce(

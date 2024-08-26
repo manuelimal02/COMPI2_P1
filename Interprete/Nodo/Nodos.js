@@ -952,4 +952,54 @@ export class IndexArreglo extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo }
+export class JoinArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Expresiones a unir
+    */
+    constructor({ id }) {
+        super();
+        
+        /**
+         * Expresiones a unir
+         * @type {string}
+        */
+        this.id = id;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitJoinArreglo(this);
+    }
+}
+    
+export class LengthArreglo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Expresiones a unir
+    */
+    constructor({ id }) {
+        super();
+        
+        /**
+         * Expresiones a unir
+         * @type {string}
+        */
+        this.id = id;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitLengthArreglo(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo }

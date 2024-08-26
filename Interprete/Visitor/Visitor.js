@@ -84,6 +84,12 @@
 
  * @typedef {import('../Nodo/Nodos.js').IndexArreglo} IndexArreglo
 
+
+ * @typedef {import('../Nodo/Nodos.js').JoinArreglo} JoinArreglo
+
+
+ * @typedef {import('../Nodo/Nodos.js').LengthArreglo} LengthArreglo
+
  */
 
 
@@ -343,6 +349,24 @@ export class BaseVisitor {
      */
     visitIndexArreglo(node) {
         throw new Error('Metodo visitIndexArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {JoinArreglo} node
+     * @returns {any}
+     */
+    visitJoinArreglo(node) {
+        throw new Error('Metodo visitJoinArreglo no implementado');
+    }
+    
+
+    /**
+     * @param {LengthArreglo} node
+     * @returns {any}
+     */
+    visitLengthArreglo(node) {
+        throw new Error('Metodo visitLengthArreglo no implementado');
     }
     
 }
