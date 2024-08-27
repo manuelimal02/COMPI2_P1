@@ -43,8 +43,6 @@ export class OperacionBinariaHandler {
                 return this.validarAnd();
             case '||':
                 return this.validarOr();
-            case '!':
-                return this.validarNot();
             default:
                 throw new Error(`Operador No Reconocido: ${this.operador}`);
         }
@@ -203,7 +201,7 @@ export class OperacionBinariaHandler {
         }
         if(this.izquierda.tipo === 'string') {
             if(this.derecha.tipo === 'string') {
-                return {valor: this.izquierda.valor.localeCompare(this.derecha.valor), tipo: 'boolean'};
+                return {valor: this.izquierda.valor === this.derecha.valor, tipo: 'boolean'};
             } else {
                 throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
@@ -248,7 +246,7 @@ export class OperacionBinariaHandler {
         }
         if (this.izquierda.tipo === 'string') {
             if (this.derecha.tipo === 'string') {
-                return {valor: this.izquierda.valor.localeCompare(this.derecha.valor) !== 0, tipo: 'boolean'};
+                return {valor: this.izquierda.valor !== this.derecha.valor , tipo: 'boolean'};
             } else {
                 throw new Error(`Error: Operación No Permitida Entre Tipos: "${this.izquierda.tipo}" Y "${this.derecha.tipo}".`);
             }
@@ -328,14 +326,6 @@ export class OperacionBinariaHandler {
             return {valor: this.izquierda.valor || this.derecha.valor, tipo: 'boolean'};
         } else {    
             throw new Error(`Error: Operación OR Solo Se Permite Entre Valores Booleanos.`);
-        }
-    }
-
-    validarNot() {
-        if (this.izquierda.tipo === 'boolean') {
-            return {valor: !this.izquierda.valor, tipo: 'boolean'};
-        } else {
-            throw new Error(`Error: Operación NOT Solo Se Permite Sobre Un Valor Booleano.`);
         }
     }
 

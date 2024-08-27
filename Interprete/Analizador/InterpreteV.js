@@ -2,6 +2,7 @@ import { Entorno } from "../Entorno/Entorno.js";
 import { BaseVisitor } from "../Visitor/Visitor.js";
 import { DeclaracionVariableHandler } from "../Instruccion/Declaracion.js";
 import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
+import { OperacionUnariaHandler } from "../Instruccion/OperacionUnaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
 import { Expresion } from "../Nodo/Nodos.js";
@@ -43,44 +44,10 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionUnaria']}
     */
     visitOperacionUnaria(node) {
+        console.log(node.operador);
         const izquierda = node.expresion.accept(this);
-        switch (node.operador) {
-            case '-':
-                if (izquierda.tipo === 'int' || izquierda.tipo === 'float') {
-                    return { valor: -izquierda.valor, tipo: izquierda.tipo };
-                } else {
-                    throw new Error(`Error: Operación - No Permitida El Tipo: "${expresion.tipo}".`);
-                }
-
-            case '++':
-                if (izquierda.tipo === 'int') {
-                    return { valor: izquierda.valor + 1, tipo: 'int' };
-                } else if (izquierda.tipo === 'float') {
-                    return { valor: izquierda.valor + 1, tipo: 'float' };
-                } else {
-                    throw new Error(`Error: Operación ++ No Permitida El Tipo: "${expresion.tipo}".`);
-                }
-
-            case '--':
-                if (izquierda.tipo === 'int') {
-                    return { valor: izquierda.valor - 1, tipo: 'int' };
-                } else if (izquierda.tipo === 'float') {
-                    return { valor: izquierda.valor - 1, tipo: 'float' };
-                } else {
-                    throw new Error(`Error: Operación -- No Permitida El Tipo: "${expresion.tipo}".`);
-                }
-
-            case '!':
-                if (izquierda.tipo === 'boolean') {
-                    return { valor: !izquierda.valor, tipo: 'boolean' };
-                } else {
-                    throw new Error(`Error: Operación ! No Permitida El Tipo: "${expresion.tipo}".`);
-                }
-
-            default:
-                throw new Error(`Operador No Reconocido: ${this.operador}`);
-        }
-
+        const handler = new OperacionUnariaHandler(node.operador, izquierda);
+        return handler.EjecutarHandler();
     }
 
     /**
@@ -156,6 +123,7 @@ export class Interprete extends BaseVisitor {
             }
         });
         this.salida += valores.join(' ') + '\n';
+        console.log(this.entornoActual);
     }
 
     /**
