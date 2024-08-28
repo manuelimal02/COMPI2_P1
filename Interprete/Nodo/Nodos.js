@@ -1223,4 +1223,37 @@ export class AsignacionMatriz extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz }
+export class AccesoMatriz extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador de la matriz
+ * @param {Expresion} options.valores Indices de la matriz
+    */
+    constructor({ id, valores }) {
+        super();
+        
+        /**
+         * Identificador de la matriz
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Indices de la matriz
+         * @type {Expresion}
+        */
+        this.valores = valores;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAccesoMatriz(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz }

@@ -605,4 +605,53 @@ export class Interprete extends BaseVisitor {
         asignarValor(matriz.valor, node.valores, node.valor.valor);
         return;
     }
+
+    /**
+     * @type {BaseVisitor['visitAccesoMatriz']}
+     */
+    visitAccesoMatriz(node) {
+        const matriz = this.entornoActual.getVariable(node.id);
+        if (!Array.isArray(matriz.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
+        }
+        node.valores.forEach((valor, index) => {
+            const numero = valor.accept(this);
+            if (numero.tipo !== 'int') {
+                throw new Error(`El Indice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
+            }
+            if (numero.valor < 0) {
+                throw new Error(`El Indice De Acceso "${index + 1}" No Puede Ser Negativa: "${numero.valor}".`);
+            }
+        });
+        for (let i = 0; i < arreglo.valor.length; i++) {
+            if (i === index.valor) {
+                return {valor: arreglo.valor[i], tipo: arreglo.tipo};
+            }
+        }
+        throw new Error(`Indice Fuera De Rango: "${index.valor}".`);
+    }
+
+    visitAccesoMatriz(node) {
+        const matriz = this.entornoActual.getVariable(node.id);
+        
+        if (!Array.isArray(matriz.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
+        }
+        let ref = matriz.valor;
+        node.valores.forEach((valor, index) => {
+            const numero = valor.accept(this);
+            if (numero.tipo !== 'int') {
+                throw new Error(`El Indice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
+            }
+            if (numero.valor < 0) {
+                throw new Error(`El Indice De Acceso "${index + 1}" No Puede Ser Negativa: "${numero.valor}".`);
+            }
+            if (numero.valor >= ref.length) {
+                throw new Error(`Índice Fuera De Rango: "${numero.valor}" En Dimensión "${index + 1}".`);
+            }
+            ref = ref[numero.valor];
+        });
+        return { valor: ref, tipo: matriz.tipo };
+    }
+    
 }    

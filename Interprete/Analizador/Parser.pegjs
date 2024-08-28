@@ -34,7 +34,8 @@
         'AsignacionArreglo': Nodos.AsignacionArreglo,
         'DeclaracionMatriz1': Nodos.DeclaracionMatriz1,
         'DeclaracionMatriz2': Nodos.DeclaracionMatriz2,
-        'AsignacionMatriz': Nodos.AsignacionMatriz
+        'AsignacionMatriz': Nodos.AsignacionMatriz, 
+        'AccesoMatriz': Nodos.AccesoMatriz
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -305,6 +306,8 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('JoinArreglo', {id})}
         / id:IDENTIFICADOR _ ".length"
             {return NuevoNodo('LengthArreglo', {id})}
+        / id:IDENTIFICADOR _ valores:VALORESMATRIZ
+            {return NuevoNodo('AccesoMatriz', {id, valores})}
         / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
             {return NuevoNodo('AccesoArreglo', {id, index})}
         / LLLAMADA
