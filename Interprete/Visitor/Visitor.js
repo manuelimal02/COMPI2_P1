@@ -102,6 +102,9 @@
 
  * @typedef {import('../Nodo/Nodos.js').DeclaracionMatriz2} DeclaracionMatriz2
 
+
+ * @typedef {import('../Nodo/Nodos.js').AsignacionMatriz} AsignacionMatriz
+
  */
 
 
@@ -415,6 +418,15 @@ export class BaseVisitor {
      */
     visitDeclaracionMatriz2(node) {
         throw new Error('Metodo visitDeclaracionMatriz2 no implementado');
+    }
+    
+
+    /**
+     * @param {AsignacionMatriz} node
+     * @returns {any}
+     */
+    visitAsignacionMatriz(node) {
+        throw new Error('Metodo visitAsignacionMatriz no implementado');
     }
     
 }

@@ -565,4 +565,44 @@ export class Interprete extends BaseVisitor {
         this.entornoActual.setVariable(node.tipo1, node.id, NuevaMatriz);
         console.log(this.entornoActual);
     }
+
+    /**
+     * @type {BaseVisitor['visitAsignacionMatriz']}
+     */
+    visitAsignacionMatriz(node) {
+        const matriz = this.entornoActual.getVariable(node.id);
+        if (!Array.isArray(matriz.valor)) {
+            throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
+        }
+        node.valores.forEach((valor, index) => {
+            const numero = valor.accept(this);
+            if (numero.tipo !== 'int') {
+                throw new Error(`El Indice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
+            }
+            if (numero.valor < 0) {
+                throw new Error(`El Indice De Acceso "${index + 1}" No Puede Ser Negativa: "${numero.valor}".`);
+            }
+        });
+        if (node.valor.tipo !== matriz.tipo) {
+            throw new Error(`El Tipo Del Valor "${valor.valor}" No Coincide Con El Tipo De La Matriz "${arreglo.tipo}".`);
+        }
+        
+        function asignarValor(matriz, indices, nuevoValor) {
+            let ref = matriz;
+            for (let i = 0; i < indices.length - 1; i++) {
+                const idx = indices[i].valor;
+                if (idx >= ref.length) {
+                    throw new Error(`Índice Fuera De Rango: "${idx}" En Dimensión: "${i + 1}".`);
+                }
+                ref = ref[idx];
+            }
+            const lastIdx = indices[indices.length - 1].valor;
+            if (lastIdx >= ref.length) {
+                throw new Error(`Índice Fuera De Rango: "${lastIdx}" En Dimensión: "${indices.length}".`);
+            }
+            ref[lastIdx] = nuevoValor;
+        }
+        asignarValor(matriz.valor, node.valores, node.valor.valor);
+        return;
+    }
 }    

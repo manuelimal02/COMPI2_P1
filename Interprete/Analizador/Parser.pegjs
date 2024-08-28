@@ -33,7 +33,8 @@
         'AccesoArreglo': Nodos.AccesoArreglo,
         'AsignacionArreglo': Nodos.AsignacionArreglo,
         'DeclaracionMatriz1': Nodos.DeclaracionMatriz1,
-        'DeclaracionMatriz2': Nodos.DeclaracionMatriz2
+        'DeclaracionMatriz2': Nodos.DeclaracionMatriz2,
+        'AsignacionMatriz': Nodos.AsignacionMatriz
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -81,6 +82,8 @@ SENTENCIA =  if_1:IF
             {return asignacion}
             /asignacionArreglo:ASIGNACIONARREGLO
             {return asignacionArreglo}
+            /asignacionMatriz:ASIGNACIONMATRIZ
+            {return asignacionMatriz}
             /switch_s:SWITCH
             {return switch_s}
             /while_s:WHILE
@@ -170,9 +173,11 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
 ASIGNACIONARREGLO = id:IDENTIFICADOR _ "[" _ index:EXPRESION _ "]" _ "=" _ valor:EXPRESION _ ";" _ 
             {return NuevoNodo('AsignacionArreglo', { id, index, valor })}
 
+ASIGNACIONMATRIZ = id:IDENTIFICADOR _ valores:VALORESMATRIZ _ "=" _ valor:EXPRESION _ ";" _
+            {return NuevoNodo('AsignacionMatriz', { id, valores, valor })}
+
 MATRIZ = tipo:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ valores:INICIALIZACION_MATRIZ _ ";" _
             {return NuevoNodo('DeclaracionMatriz1', {tipo, dimensiones, id, valores});}
-            //int[][] mtx2 = new int[3][3];
             / tipo1:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ "new"_ tipo2:TIPO _ valores:VALORESMATRIZ _ ";" _
             {return NuevoNodo('DeclaracionMatriz2', {tipo1, dimensiones, id, tipo2, valores});}
 
@@ -200,8 +205,6 @@ LISTA_VALORES = _ "{" _ valores:LISTA_VALORES _ "}" valoresRestantes:(_ "," _ LI
 
 VALORESMATRIZ = _ "[" _ expresion:EXPRESION _ "]" _ resto:VALORESMATRIZ* 
             { return [expresion].concat(resto.flat());}
-
-
 
 EXPRESION =  ternario:TERNARIO
             {return ternario}
