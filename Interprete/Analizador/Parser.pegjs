@@ -31,7 +31,9 @@
         'JoinArreglo': Nodos.JoinArreglo,
         'LengthArreglo': Nodos.LengthArreglo,
         'AccesoArreglo': Nodos.AccesoArreglo,
-        'AsignacionArreglo': Nodos.AsignacionArreglo
+        'AsignacionArreglo': Nodos.AsignacionArreglo,
+        'DeclaracionMatriz1': Nodos.DeclaracionMatriz1,
+        'DeclaracionMatriz2': Nodos.DeclaracionMatriz2
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -53,6 +55,8 @@ DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
             /arreglo:ARREGLO
             {return arreglo}
+            /matriz:MATRIZ
+            {return matriz}
 
 ARREGLO = tipo:TIPO _ "[]" _ id:IDENTIFICADOR _ "=" _ valores:VALORES _ ";" 
             {return NuevoNodo('DeclaracionArreglo1', {tipo, id, valores})}
@@ -90,13 +94,13 @@ SENTENCIA =  if_1:IF
             /return_s:RETURN
             {return return_s}
 
-IF = "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
+IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
             _ "else" _ sentenciasFalso:SENTENCIA 
             { return sentenciasFalso } )? 
             { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
 
-PRINT = "print(" _ expresion:EXPRESIONES _ ")" _ ";" _
+PRINT = _ "print(" _ expresion:EXPRESIONES _ ")" _ ";" _
         {return NuevoNodo('Print', { expresion })}
 
 EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)* 
@@ -109,7 +113,7 @@ EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)*
 BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
             {return NuevoNodo('Bloque', { sentencias }) }
 
-SWITCH = "switch" _ "(" _ condicion:EXPRESION _ ")" _ "{" _ cases:SWITCHCASE* default1:DEFAULTCASE? _ "}" 
+SWITCH = _"switch" _ "(" _ condicion:EXPRESION _ ")" _ "{" _ cases:SWITCHCASE* default1:DEFAULTCASE? _ "}" 
             {return NuevoNodo('Switch', { condicion, cases, default1 }) }
 
 SWITCHCASE = _ "case" _ valor:EXPRESION _ ":" _ bloquecase:INSTRUCCIONES* 
@@ -121,7 +125,7 @@ DEFAULTCASE = _ "default" _ ":" _ sentencias:SENTENCIA*
 WHILE = _ "while" _ "(" _ condicion:EXPRESION _ ")" _ sentencias:BLOQUE 
             {return NuevoNodo('While', { condicion, sentencias }) }
 
-FOR = "for" _ "("_ declaracion:FORINIT _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
+FOR = _ "for" _ "("_ declaracion:FORINIT _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
             {return NuevoNodo('For', { declaracion, condicion, incremento, sentencia }) }
 
 FORINIT = declaracion:DECLARACION 
@@ -131,13 +135,13 @@ FORINIT = declaracion:DECLARACION
             / ";" _
             {return null}
 
-BREAK = "break" _ ";" _ 
+BREAK = _ "break" _ ";" _ 
             {return NuevoNodo('Break')}
 
-CONTUNUE = "continue" _ ";" _ 
+CONTUNUE = _ "continue" _ ";" _ 
             {return NuevoNodo('Continue')}
 
-RETURN = "return" _ expresion:EXPRESION? _ ";" _ 
+RETURN = _ "return" _ expresion:EXPRESION? _ ";" _ 
             {return NuevoNodo('Return', {expresion})}
 
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
@@ -165,6 +169,39 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
 
 ASIGNACIONARREGLO = id:IDENTIFICADOR _ "[" _ index:EXPRESION _ "]" _ "=" _ valor:EXPRESION _ ";" _ 
             {return NuevoNodo('AsignacionArreglo', { id, index, valor })}
+
+MATRIZ = tipo:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ valores:INICIALIZACION_MATRIZ _ ";" _
+            {return NuevoNodo('DeclaracionMatriz1', {tipo, dimensiones, id, valores});}
+            //int[][] mtx2 = new int[3][3];
+            / tipo1:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ "new"_ tipo2:TIPO _ valores:VALORESMATRIZ _ ";" _
+            {return NuevoNodo('DeclaracionMatriz2', {tipo1, dimensiones, id, tipo2, valores});}
+
+//DECLARACION MATRIZ CON VALORES
+LISTADIMENSIONES = _"[" _ "]"_ dimensiones:LISTADIMENSIONES? 
+    {return [null].concat(dimensiones || []);}
+
+INICIALIZACION_MATRIZ = _ "{" _ valores:LISTA_VALORES _ "}" _
+    {return valores;}
+
+LISTA_VALORES = _ "{" _ valores:LISTA_VALORES _ "}" valoresRestantes:(_ "," _ LISTA_VALORES)? _
+    {
+        if (valoresRestantes) {
+            return [valores].concat(valoresRestantes[3]);
+        }
+        return [valores];
+    }
+    / valor:EXPRESION valoresRestantes:(_ "," _ LISTA_VALORES)?
+    {
+        if (valoresRestantes) {
+            return [valor].concat(valoresRestantes[3]);
+        }
+        return [valor];
+    }
+
+VALORESMATRIZ = _ "[" _ expresion:EXPRESION _ "]" _ resto:VALORESMATRIZ* 
+            { return [expresion].concat(resto.flat());}
+
+
 
 EXPRESION =  ternario:TERNARIO
             {return ternario}

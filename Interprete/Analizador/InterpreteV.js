@@ -44,7 +44,6 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitOperacionUnaria']}
     */
     visitOperacionUnaria(node) {
-        console.log(node.operador);
         const izquierda = node.expresion.accept(this);
         const handler = new OperacionUnariaHandler(node.operador, izquierda);
         return handler.EjecutarHandler();
@@ -115,11 +114,11 @@ export class Interprete extends BaseVisitor {
     
     visitPrint(node) {
         const valores = node.expresion.map(expresion => {
-            const resultado = expresion.accept(this);
-            if (Array.isArray(resultado)) {
-                return resultado;
+            const Matriz = expresion.accept(this);
+            if (Array.isArray(Matriz)) {
+                return Matriz;
             } else {
-                return resultado.valor;
+                return Matriz.valor;
             }
         });
         this.salida += valores.join(' ') + '\n';
@@ -485,5 +484,85 @@ export class Interprete extends BaseVisitor {
         }
         arreglo.valor[index.valor] = valor.valor;
         return;
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionMatriz1']}
+     */
+    visitDeclaracionMatriz1(node) {
+        const RecorrerMatriz = (valores, tipo) => {
+            const Matriz = [];
+            for (let valor of valores) {
+                if (Array.isArray(valor)) {
+                    Matriz.push(RecorrerMatriz(valor, tipo));
+                } else {
+                    const ValorActual = valor.accept(this);
+                    if (ValorActual.tipo !== tipo) {
+                        throw new Error(`El Tipo Del Valor "${ValorActual.valor}" No Coincide Con El Tipo Del Arreglo "${tipo}".`);
+                    }
+                    Matriz.push(ValorActual.valor);
+                }
+            }
+            return Matriz;
+        };
+        const NuevaMatriz = RecorrerMatriz(node.valores, node.tipo);
+        this.entornoActual.setVariable(node.tipo, node.id, NuevaMatriz);
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionMatriz2']}
+     */
+    visitDeclaracionMatriz2(node) {
+        if (node.tipo1 !== node.tipo2) {
+            throw new Error(`El Tipo De La Matriz "${node.tipo1}" No Coincide Con El Tipo Del La Matriz "${node.tipo2}".`);
+        }
+        if (node.dimensiones.length !== node.valores.length) {       
+            throw new Error(`Las Dimensiones De La Matriz "${node.dimensiones.length}" No Coinciden Con El Número De Valores "${node.valores.length}".`);
+        }
+        node.valores.forEach((valor, index) => {
+            const numero = valor.accept(this);
+            if (numero.tipo !== 'int') {
+                throw new Error(`La Dimensión ${index + 1} Debe Ser De Tipo Int: "${numero.tipo}".`);
+            }
+            if (numero.valor < 0) {
+                throw new Error(`La Dimensión ${index + 1} No Puede Ser Negativa: "${numero.valor}".`);
+            }
+        });
+        function crearMatriz(Valores, tipo, ValorPorDefecto) {
+            const DimensionActual = Valores[0];
+            const SubDimension = Valores.slice(1);
+            const Matriz = Array(DimensionActual.valor).fill(null);
+            if (SubDimension.length > 0) {
+                for (let i = 0; i < DimensionActual.valor; i++) {
+                    Matriz[i] = crearMatriz(SubDimension, tipo, ValorPorDefecto);
+                }
+            } else {
+                Matriz.fill(ValorPorDefecto);
+            }
+            return Matriz;
+        }        
+        let ValorPorDefecto;
+        switch (node.tipo1) {
+            case 'int':
+                ValorPorDefecto = 0;
+                break;
+            case 'float':
+                ValorPorDefecto = 0.0;
+                break;
+            case 'string':
+                ValorPorDefecto = '';
+                break;
+            case 'char':
+                ValorPorDefecto = '\0';
+                break;
+            case 'boolean':
+                ValorPorDefecto = false;
+                break;
+            default:
+                throw new Error(`Tipo De Matriz No Válido: "${node.tipo1}".`);
+        }
+        const NuevaMatriz = crearMatriz(node.valores, node.tipo1, ValorPorDefecto);
+        this.entornoActual.setVariable(node.tipo1, node.id, NuevaMatriz);
+        console.log(this.entornoActual);
     }
 }    

@@ -103,19 +103,32 @@ export function FuncionInterprete() {
 
     function ejecutarCodigo() {
         const codigo = entrada.value;
+        const interprete = new Interprete();
+        let sentencias;
+        
         try {
-            const sentencias = parse(codigo);
-            const interprete = new Interprete();
+            sentencias = parse(codigo);
             console.log({ sentencias });
-            sentencias.forEach(sentencia => sentencia.accept(interprete));
-            salida.value = interprete.salida;
         } catch (error) {
-            salida.innerHTML = "Error: "+ error.message;
-            console.error("Error:", error);
-            UltimoAST = null;
+            salida.innerHTML = "Error de sintaxis: " + error.message;
+            console.error("Error de sintaxis:", error);
+            return;
         }
+    
+        sentencias.forEach(sentencia => {
+            try {
+                sentencia.accept(interprete);
+            } catch (error) {
+                // Aquí se captura el error de la sentencia específica
+                interprete.salida += "Error: " + error.message + '\n';
+                console.error("Error:", error);
+            }
+        });
+    
+        salida.value = interprete.salida;
         ActualizarNumeroLinea(salida, LNSalida);
     }
+    
 
     entrada.addEventListener('input', manejarEntrada);
     entrada.addEventListener('scroll', () => sincronizarScroll(entrada, LNEntrada));

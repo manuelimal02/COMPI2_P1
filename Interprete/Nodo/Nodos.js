@@ -1076,4 +1076,110 @@ export class AsignacionArreglo extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo }
+export class DeclaracionMatriz1 extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de elementos de la matriz
+ * @param {Expresion} options.dimensiones Dimensiones de la matriz
+ * @param {Expresion} options.id Identificador del la matriz
+ * @param {Expresion} options.valores Valores del la matriz
+    */
+    constructor({ tipo, dimensiones, id, valores }) {
+        super();
+        
+        /**
+         * Tipo de elementos de la matriz
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Dimensiones de la matriz
+         * @type {Expresion}
+        */
+        this.dimensiones = dimensiones;
+
+
+        /**
+         * Identificador del la matriz
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Valores del la matriz
+         * @type {Expresion}
+        */
+        this.valores = valores;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionMatriz1(this);
+    }
+}
+    
+export class DeclaracionMatriz2 extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo1 Tipo de elementos de la matriz
+ * @param {Expresion} options.dimensiones Dimensiones de la matriz
+ * @param {Expresion} options.id Identificador del la matriz
+ * @param {string} options.tipo2 Tipo de elementos de la matriz
+ * @param {Expresion} options.valores Valores del la matriz
+    */
+    constructor({ tipo1, dimensiones, id, tipo2, valores }) {
+        super();
+        
+        /**
+         * Tipo de elementos de la matriz
+         * @type {string}
+        */
+        this.tipo1 = tipo1;
+
+
+        /**
+         * Dimensiones de la matriz
+         * @type {Expresion}
+        */
+        this.dimensiones = dimensiones;
+
+
+        /**
+         * Identificador del la matriz
+         * @type {Expresion}
+        */
+        this.id = id;
+
+
+        /**
+         * Tipo de elementos de la matriz
+         * @type {string}
+        */
+        this.tipo2 = tipo2;
+
+
+        /**
+         * Valores del la matriz
+         * @type {Expresion}
+        */
+        this.valores = valores;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionMatriz2(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2 }
