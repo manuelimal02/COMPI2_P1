@@ -27,7 +27,7 @@ export const Embebidas = {
         }
         return { valor: valor, tipo: "int" };
     }),
-    parseFloat: new FuncionNativa(1, (arg) => {
+    parsefloat: new FuncionNativa(1, (arg) => {
         if (arg.tipo !== "string") {
             throw new Error(`El Argumento De parseFloat Debe Ser De Tipo String, Pero Se Recibió Un "${arg.tipo}".`);
         }

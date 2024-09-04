@@ -163,6 +163,8 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitWhile']}
     */
     visitWhile(node) {
+        console.log(node.condicion);
+        console.log(node.sentencias);
         const EntornoInicial = this.entornoActual;
         const condicion = node.condicion.accept(this);
         if (condicion.tipo !== 'boolean') {
