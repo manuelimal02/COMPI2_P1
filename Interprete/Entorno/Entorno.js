@@ -74,19 +74,5 @@ export class Entorno {
             throw new Error(`La Variable: "${nombre}" Ya Está Definida.`);
         }
         this.valores[nombre] = {valor, tipo}
-    }       
-    
-    deleteTemporal(nombre) {
-        const actual = this.valores[nombre]
-        if(actual != undefined) {
-            delete this.valores[nombre]
-            return
-        }
-        if(!actual && this.entornoPadre) {
-            this.entornoPadre.deleteVariable(nombre)
-            return
-        }
-        throw new Error(`La Variable "${nombre}" No Está Definida.`);
     }
-    
 }

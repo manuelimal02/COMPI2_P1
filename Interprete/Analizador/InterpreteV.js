@@ -635,7 +635,43 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitForEach']}
      */
     visitForEach(node) {
-        
+        // Obtener el arreglo del entorno
+        const arreglo = this.entornoActual.getVariable(node.arreglo);
+        // Validar que sea un arreglo
+        if (!Array.isArray(arreglo.valor)) {
+            throw new Error(`La Variable: "${node.arreglo}" No Es Un Arreglo.`);
+        }
+        // Validar que el tipo del arreglo coincide con el tipo declarado en el foreach
+        if (node.tipo !== arreglo.tipo) {
+            throw new Error(`El Tipo Del Arreglo "${arreglo.tipo}" No Coincide Con El Tipo De La Variable "${node.tipo}".`);
+        }
+        // Recorrer el arreglo
+        for (let elemento of arreglo.valor) {
+            // Crear un nuevo entorno para cada iteración
+            const entornoNuevo = new Entorno(this.entornoActual);
+            // Setear la variable iteradora con el valor actual del arreglo
+            entornoNuevo.setTemporal(node.tipo, node.id, { valor: elemento, tipo: node.tipo });
+            // Proteger la variable iteradora para que no pueda ser reasignada
+            entornoNuevo.assignVariable = function(nombre, valor) {
+                if (nombre === node.id) {
+                    throw new Error(`La Variable "${nombre}" No Puede Ser Reasignada Dentro De Un Foreach.`);
+                }
+                Entorno.prototype.assignVariable.call(this, nombre, valor);
+            };
+            // Establecer el nuevo entorno como el actual
+            const entornoAnterior = this.entornoActual;
+            this.entornoActual = entornoNuevo;
+            try {
+                // Ejecutar el bloque de sentencias
+                node.sentencias.accept(this);
+            } catch (error) {
+                // Restaurar el entorno anterior si ocurre un error
+                this.entornoActual = entornoAnterior;
+                throw error;
+            }
+            // Restaurar el entorno anterior al final de la iteración
+            this.entornoActual = entornoAnterior;
+        }
     }
 
     /**
