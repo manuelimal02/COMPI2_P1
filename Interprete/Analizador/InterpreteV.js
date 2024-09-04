@@ -10,6 +10,7 @@ import { Embebidas } from "../Instruccion/Embebida.js";
 import { Invocable } from "../Instruccion/Invocable.js";
 import { BreakException, ContinueException, ReturnException } from "../Instruccion/Transferencia.js";
 import Nodos from "../Nodo/Nodos.js";
+import { Foranea } from "../Instruccion/Foranea.js";
 
 export class Interprete extends BaseVisitor {
 
@@ -111,7 +112,6 @@ export class Interprete extends BaseVisitor {
     /**
     * @type {BaseVisitor['visitPrint']}
     */
-    
     visitPrint(node) {
         const valores = node.expresion.map(expresion => {
             const Matriz = expresion.accept(this);
@@ -122,7 +122,6 @@ export class Interprete extends BaseVisitor {
             }
         });
         this.salida += valores.join(' ') + '\n';
-        console.log(this.entornoActual);
     }
 
     /**
@@ -292,11 +291,12 @@ export class Interprete extends BaseVisitor {
         const funcion = node.callee.accept(this);
         const argumentos = node.argumentos.map(arg => arg.accept(this));
         if (!(funcion instanceof Invocable)) {
-            throw new Error(`La variable "${node.callee.id}" no es invocable`);
+            throw new Error(`La variable: "${node.callee.id}" no es invocable.`);
         }
         if (funcion.aridad() !== argumentos.length) {
-            throw new Error(`La función espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}`);
+            throw new Error(`La función: "${node.callee.id}" espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}.`);
         }
+        
         return funcion.invocar(this, argumentos);
     }
 
@@ -571,66 +571,41 @@ export class Interprete extends BaseVisitor {
      */
     visitAsignacionMatriz(node) {
         const matriz = this.entornoActual.getVariable(node.id);
+        const nuevoValor = node.NuevoDato.accept(this);
+        // Verificar si la variable es una matriz
         if (!Array.isArray(matriz.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
         }
-        node.valores.forEach((valor, index) => {
-            const numero = valor.accept(this);
+        // Verificar tipos y rangos de los índices
+        let subMatriz = matriz.valor;
+        node.indices.forEach((indice, index) => {
+            const numero = indice.accept(this);
             if (numero.tipo !== 'int') {
-                throw new Error(`El Indice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
+                throw new Error(`El Índice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
             }
-            if (numero.valor < 0) {
-                throw new Error(`El Indice De Acceso "${index + 1}" No Puede Ser Negativa: "${numero.valor}".`);
+            if (numero.valor < 0 || numero.valor >= subMatriz.length) {
+                throw new Error(`Índice Fuera De Rango: "${numero.valor}" En Dimensión "${index + 1}".`);
+            }
+            // Avanzar en la matriz multidimensional
+            if (index < node.indices.length - 1) {
+                subMatriz = subMatriz[numero.valor];
+                if (!Array.isArray(subMatriz)) {
+                    throw new Error(`La Variable En Dimensión "${index + 2}" No Es Una Matriz.`);
+                }
+            } else {
+                // Último nivel, asignar el nuevo valor
+                subMatriz[numero.valor] = nuevoValor.valor;
             }
         });
-        if (node.valor.tipo !== matriz.tipo) {
-            throw new Error(`El Tipo Del Valor "${valor.valor}" No Coincide Con El Tipo De La Matriz "${arreglo.tipo}".`);
+        // Verificar si el tipo del nuevo valor coincide con el tipo de la matriz
+        if (nuevoValor.tipo !== matriz.tipo) {
+            throw new Error(`El Tipo Del Valor "${nuevoValor.tipo}" No Coincide Con El Tipo De La Matriz "${matriz.tipo}".`);
         }
-        
-        function asignarValor(matriz, indices, nuevoValor) {
-            let ref = matriz;
-            for (let i = 0; i < indices.length - 1; i++) {
-                const idx = indices[i].valor;
-                if (idx >= ref.length) {
-                    throw new Error(`Índice Fuera De Rango: "${idx}" En Dimensión: "${i + 1}".`);
-                }
-                ref = ref[idx];
-            }
-            const lastIdx = indices[indices.length - 1].valor;
-            if (lastIdx >= ref.length) {
-                throw new Error(`Índice Fuera De Rango: "${lastIdx}" En Dimensión: "${indices.length}".`);
-            }
-            ref[lastIdx] = nuevoValor;
-        }
-        asignarValor(matriz.valor, node.valores, node.valor.valor);
-        return;
     }
 
     /**
      * @type {BaseVisitor['visitAccesoMatriz']}
      */
-    visitAccesoMatriz(node) {
-        const matriz = this.entornoActual.getVariable(node.id);
-        if (!Array.isArray(matriz.valor)) {
-            throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
-        }
-        node.valores.forEach((valor, index) => {
-            const numero = valor.accept(this);
-            if (numero.tipo !== 'int') {
-                throw new Error(`El Indice De Acceso "${index + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
-            }
-            if (numero.valor < 0) {
-                throw new Error(`El Indice De Acceso "${index + 1}" No Puede Ser Negativa: "${numero.valor}".`);
-            }
-        });
-        for (let i = 0; i < arreglo.valor.length; i++) {
-            if (i === index.valor) {
-                return {valor: arreglo.valor[i], tipo: arreglo.tipo};
-            }
-        }
-        throw new Error(`Indice Fuera De Rango: "${index.valor}".`);
-    }
-
     visitAccesoMatriz(node) {
         const matriz = this.entornoActual.getVariable(node.id);
         
@@ -653,5 +628,25 @@ export class Interprete extends BaseVisitor {
         });
         return { valor: ref, tipo: matriz.tipo };
     }
-    
+
+    /**
+     * @type {BaseVisitor['visitForEach']}
+     */
+    visitForEach(node) {
+        
+    }
+
+    /**
+     * @type {BaseVisitor['visitFuncionForanea']}
+     */
+    visitFuncionForanea(node) {
+        const nombre = node.parametros.map(param => param.id);
+        const nombresUnicos = new Set(nombre);
+        if (nombre.length !== nombresUnicos.size) {
+            throw new Error(`Los parámetros de la función "${node.id}" no deben tener el mismo nombre.`);
+        }
+        const funcion = new Foranea(node, this.entornoActual);
+        this.entornoActual.setVariable(node.tipo, node.id, funcion);
+        console.log(this.entornoActual);
+    }
 }    

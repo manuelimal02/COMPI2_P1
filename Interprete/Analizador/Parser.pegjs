@@ -35,7 +35,9 @@
         'DeclaracionMatriz1': Nodos.DeclaracionMatriz1,
         'DeclaracionMatriz2': Nodos.DeclaracionMatriz2,
         'AsignacionMatriz': Nodos.AsignacionMatriz, 
-        'AccesoMatriz': Nodos.AccesoMatriz
+        'AccesoMatriz': Nodos.AccesoMatriz, 
+        'ForEach': Nodos.ForEach,
+        'FuncionForanea': Nodos.FuncionForanea
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -55,10 +57,25 @@ DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id, expresion })}
             / tipo:TIPO _ id:IDENTIFICADOR _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
+            /funcionForanea:FUNCIONFORRANEA
+            {return funcionForanea}
             /arreglo:ARREGLO
             {return arreglo}
             /matriz:MATRIZ
             {return matriz}
+
+
+FUNCIONFORRANEA = tipo:(TIPO/ "void") _ id:IDENTIFICADOR _ "(" _ parametros:PARAMETROS? _ ")" _ bloque:BLOQUE
+            { return NuevoNodo('FuncionForanea', { tipo, id, parametros: parametros || [], bloque }) }
+
+PARAMETROS = primerParametro:PARAMETRO restoParametros:("," _ parametro:PARAMETRO { return parametro; })* 
+            { return [primerParametro, ...restoParametros]; }
+
+PARAMETRO = tipo:TIPO dimensiones:ARREGLODIMENSION? _ id:IDENTIFICADOR
+            { return { tipo, id, dim: dimensiones || "" }; }
+
+ARREGLODIMENSION = "[" _ "]"+  { return text(); }
+
 
 ARREGLO = tipo:TIPO _ "[]" _ id:IDENTIFICADOR _ "=" _ valores:VALORES _ ";" 
             {return NuevoNodo('DeclaracionArreglo1', {tipo, id, valores})}
@@ -79,6 +96,14 @@ SENTENCIA =  if_1:IF
             {return print_s}
             /bloque:BLOQUE
             {return bloque}
+            /break_s:BREAK
+            {return break_s}
+            /continue_s:CONTUNUE
+            {return continue_s}
+            /return_s:RETURN
+            {return return_s}
+            / llamada:LLAMADA _ ";" _
+            {return llamada}
             /asignacion:ASIGNACION
             {return asignacion}
             /asignacionArreglo:ASIGNACIONARREGLO
@@ -91,12 +116,8 @@ SENTENCIA =  if_1:IF
             {return while_s}
             /for_s:FOR
             {return for_s}
-            /break_s:BREAK
-            {return break_s}
-            /continue_s:CONTUNUE
-            {return continue_s}
-            /return_s:RETURN
-            {return return_s}
+            /foreach:FOREACH
+            {return foreach}
 
 IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -104,7 +125,7 @@ IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA
             { return sentenciasFalso } )? 
             { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
 
-PRINT = _ "print(" _ expresion:EXPRESIONES _ ")" _ ";" _
+PRINT = _ "System.out.println(" _ expresion:EXPRESIONES _ ")" _ ";" _
         {return NuevoNodo('Print', { expresion })}
 
 EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)* 
@@ -131,6 +152,9 @@ WHILE = _ "while" _ "(" _ condicion:EXPRESION _ ")" _ sentencias:BLOQUE
 
 FOR = _ "for" _ "("_ declaracion:FORINIT _ condicion:EXPRESION _ ";" _ incremento:ASIGNACION _ ")" _ sentencia:SENTENCIA 
             {return NuevoNodo('For', { declaracion, condicion, incremento, sentencia }) }
+
+FOREACH = _ "for" _ "(" _ tipo: TIPO _ id:IDENTIFICADOR _ ":" _ arreglo: IDENTIFICADOR _ ")" _ sentencias:SENTENCIA 
+            {return NuevoNodo('ForEach', {tipo, id, arreglo, sentencias})}
 
 FORINIT = declaracion:DECLARACION 
             {return declaracion}
@@ -174,8 +198,8 @@ ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _
 ASIGNACIONARREGLO = id:IDENTIFICADOR _ "[" _ index:EXPRESION _ "]" _ "=" _ valor:EXPRESION _ ";" _ 
             {return NuevoNodo('AsignacionArreglo', { id, index, valor })}
 
-ASIGNACIONMATRIZ = id:IDENTIFICADOR _ valores:VALORESMATRIZ _ "=" _ valor:EXPRESION _ ";" _
-            {return NuevoNodo('AsignacionMatriz', { id, valores, valor })}
+ASIGNACIONMATRIZ = id:IDENTIFICADOR _ indices:VALORESMATRIZ _ "=" _ NuevoDato:EXPRESION _ ";" _
+            {return NuevoNodo('AsignacionMatriz', { id, indices, NuevoDato })}
 
 MATRIZ = tipo:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ valores:INICIALIZACION_MATRIZ _ ";" _
             {return NuevoNodo('DeclaracionMatriz1', {tipo, dimensiones, id, valores});}
@@ -310,9 +334,9 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('AccesoMatriz', {id, valores})}
         / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
             {return NuevoNodo('AccesoArreglo', {id, index})}
-        / LLLAMADA
+        / LLAMADA
 
-LLLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
+LLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
     return parametros.reduce(
         (callee, argumentos) => {
             return NuevoNodo('Llamada', { callee, argumentos: argumentos || [] })
@@ -322,8 +346,8 @@ LLLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { r
 }
 
 ARGUMENTOS = argumento:EXPRESION _ argumentos:("," _ expresion:EXPRESION 
-{ return expresion })* 
-{ return [argumento, ...argumentos] }
+            { return expresion })* 
+            { return [argumento, ...argumentos] }
 
 OTRAEXPRESION = decimal:DECIMAL
             {return decimal}

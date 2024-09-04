@@ -659,6 +659,55 @@ export class For extends Expresion {
     }
 }
     
+export class ForEach extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de los elementos del arreglo
+ * @param {string} options.id Identificador del arreglo
+ * @param {string} options.arreglo Identificador del arreglo
+ * @param {Expresion} options.sentencias Cuerpo del forEach
+    */
+    constructor({ tipo, id, arreglo, sentencias }) {
+        super();
+        
+        /**
+         * Tipo de los elementos del arreglo
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Identificador del arreglo
+         * @type {string}
+        */
+        this.arreglo = arreglo;
+
+
+        /**
+         * Cuerpo del forEach
+         * @type {Expresion}
+        */
+        this.sentencias = sentencias;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitForEach(this);
+    }
+}
+    
 export class Break extends Expresion {
 
     /**
@@ -1187,10 +1236,10 @@ export class AsignacionMatriz extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.id Identificador de la matriz
- * @param {Expresion} options.valores Indices de la matriz
- * @param {Expresion} options.valor Valor a asignar
+ * @param {Expresion} options.indices Indices de la matriz
+ * @param {Expresion} options.NuevoDato Valor a asignar
     */
-    constructor({ id, valores, valor }) {
+    constructor({ id, indices, NuevoDato }) {
         super();
         
         /**
@@ -1204,14 +1253,14 @@ export class AsignacionMatriz extends Expresion {
          * Indices de la matriz
          * @type {Expresion}
         */
-        this.valores = valores;
+        this.indices = indices;
 
 
         /**
          * Valor a asignar
          * @type {Expresion}
         */
-        this.valor = valor;
+        this.NuevoDato = NuevoDato;
 
     }
 
@@ -1256,4 +1305,53 @@ export class AccesoMatriz extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz }
+export class FuncionForanea extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la funcion.
+ * @param {string} options.id Identificador de la funcion
+ * @param {string[]} options.parametros Parametros de la funcion
+ * @param {Bloque} options.bloque Cuerpo de la funcion
+    */
+    constructor({ tipo, id, parametros, bloque }) {
+        super();
+        
+        /**
+         * Tipo de la funcion.
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la funcion
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Parametros de la funcion
+         * @type {string[]}
+        */
+        this.parametros = parametros;
+
+
+        /**
+         * Cuerpo de la funcion
+         * @type {Bloque}
+        */
+        this.bloque = bloque;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitFuncionForanea(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, ForEach, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz, FuncionForanea }

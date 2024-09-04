@@ -58,6 +58,9 @@
  * @typedef {import('../Nodo/Nodos.js').For} For
 
 
+ * @typedef {import('../Nodo/Nodos.js').ForEach} ForEach
+
+
  * @typedef {import('../Nodo/Nodos.js').Break} Break
 
 
@@ -107,6 +110,9 @@
 
 
  * @typedef {import('../Nodo/Nodos.js').AccesoMatriz} AccesoMatriz
+
+
+ * @typedef {import('../Nodo/Nodos.js').FuncionForanea} FuncionForanea
 
  */
 
@@ -290,6 +296,15 @@ export class BaseVisitor {
     
 
     /**
+     * @param {ForEach} node
+     * @returns {any}
+     */
+    visitForEach(node) {
+        throw new Error('Metodo visitForEach no implementado');
+    }
+    
+
+    /**
      * @param {Break} node
      * @returns {any}
      */
@@ -439,6 +454,15 @@ export class BaseVisitor {
      */
     visitAccesoMatriz(node) {
         throw new Error('Metodo visitAccesoMatriz no implementado');
+    }
+    
+
+    /**
+     * @param {FuncionForanea} node
+     * @returns {any}
+     */
+    visitFuncionForanea(node) {
+        throw new Error('Metodo visitFuncionForanea no implementado');
     }
     
 }
