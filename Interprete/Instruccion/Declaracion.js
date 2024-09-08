@@ -50,6 +50,7 @@ export class DeclaracionVariableHandler {
         if (tipoInferido === 'float' && valor.tipo === 'int' || tipoInferido === 'float' && valor.tipo === 'float') {
             valor.tipo = 'float';
             entorno.setVariable(tipoInferido, this.nombre, valor);
+            console.log('Variable Declarada:', this.nombre, valor);
             return;
         }
         if (tipoInferido === valor.tipo) {
