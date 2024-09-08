@@ -29,32 +29,33 @@ export class Foranea extends Invocable {
         this.node.parametros.forEach((param, i) => {
             entornoNuevo.setVariable(param.tipo, param.id, argumentos[i]);
         });
-        const entornoAntesDeLaLlamada = interprete.entornoActual;
+        const EntornoAnteriorLlamada = interprete.entornoActual;
         interprete.entornoActual = entornoNuevo;
         try {
             this.node.bloque.accept(interprete);
         } catch (error) {
-            interprete.entornoActual = entornoAntesDeLaLlamada;
+            interprete.entornoActual = EntornoAnteriorLlamada;
             if (error instanceof ReturnException) {
-                // Verificar si la función es de tipo 'void' y si 'ReturnException' tiene un valor
                 if (this.node.tipo === 'void' && error.valor !== null) {
-                    throw new Error(`Una función de tipo 'void' no puede retornar un valor.`);
+                    throw new Error(`Una Función: "${this.node.id}" De Tipo 'void' No puede Retornar Un Valor.`);
                 }
                 if(this.node.tipo === 'void' && error.valor === null){
                     return null;  
                 }
                 if (this.node.tipo !== error.valor.tipo) {
-                    throw new Error(`El tipo de retorno no coincide con el esperado ${this.node.tipo} != ${error.valor.tipo}`);
+                    throw new Error(`El Tipo De Retorno: "${this.node.tipo}" No Coincide Con El Esperado: "${error.valor.tipo}".`);
                 }
                 return error.valor;
             }
-            if (error instanceof BreakException) {
-                return;
+            if (this.node.tipo !== 'void' && error instanceof BreakException) {
+                throw new Error(`La Función ${this.node.id} Debe Retornar Un valor.`);
+            }
+            if (this.node.tipo !== 'void' && error instanceof ContinueException) {
+                throw new Error(`La Función ${this.node.id} Debe Retornar Un Valor.`);
             }
             throw error;
         }
-        interprete.entornoActual = entornoAntesDeLaLlamada;
+        interprete.entornoActual = EntornoAnteriorLlamada;
         return null;
     }
 }
-

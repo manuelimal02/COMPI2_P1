@@ -133,12 +133,13 @@ export class Interprete extends BaseVisitor {
     */
     visitPrint(node) {
         const valores = node.expresion.map(expresion => {
-            const Matriz = expresion.accept(this);
-            if (Array.isArray(Matriz)) {
-                return Matriz;
-            } else {
-                return Matriz.valor;
+            const simbolo = expresion.accept(this);
+            if (simbolo.tipo === 'float') {
+                if (Number.isInteger(simbolo.valor)) {
+                    simbolo.valor = simbolo.valor.toFixed(1);
+                }
             }
+            return simbolo.valor;
         });
         this.salida += valores.join(' ') + '\n';
     }
@@ -335,7 +336,14 @@ export class Interprete extends BaseVisitor {
         if (funcion.aridad() !== argumentos.length) {
             throw new Error(`La función: "${node.callee.id}" espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}.`);
         }
-        
+        if (funcion.aridad() > 0) {
+            funcion.node.parametros.forEach((param, i) => {
+                const argumento = argumentos[i];
+                if (param.tipo !== argumento.tipo) {
+                    throw new Error(`El argumento en la posición ${i + 1} debe ser de tipo "${param.tipo}", pero se recibió "${argumento.tipo}".`);
+                }
+            });
+        }
         return funcion.invocar(this, argumentos);
     }
 
@@ -704,7 +712,7 @@ export class Interprete extends BaseVisitor {
      */
     visitForEach(node) {
         // Obtener el arreglo del entorno
-        const arreglo = this.entornoActual.getVariable(node.arreglo);
+        const arreglo = this.entornoActual.getVariable(node.arreglo).valor;
         // Validar que sea un arreglo
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.arreglo}" No Es Un Arreglo.`);
@@ -753,6 +761,7 @@ export class Interprete extends BaseVisitor {
         }
         const funcion = new Foranea(node, this.entornoActual);
         this.entornoActual.setVariable(node.tipo, node.id, funcion);
+        console.log(this.entornoActual)
     }
 
     /**
