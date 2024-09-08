@@ -1354,4 +1354,185 @@ export class FuncionForanea extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, ForEach, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz, FuncionForanea }
+export class Struct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.id Identificador de la clase
+ * @param {Expresion[]} options.atributos Declaraciones de la clase
+    */
+    constructor({ id, atributos }) {
+        super();
+        
+        /**
+         * Identificador de la clase
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Declaraciones de la clase
+         * @type {Expresion[]}
+        */
+        this.atributos = atributos;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitStruct(this);
+    }
+}
+    
+export class DeclaracionStruct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la estructura
+ * @param {string} options.id Identificador de la estructura
+ * @param {Expresion} options.expresion Expresion de la estructura
+    */
+    constructor({ tipo, id, expresion }) {
+        super();
+        
+        /**
+         * Tipo de la estructura
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Identificador de la estructura
+         * @type {string}
+        */
+        this.id = id;
+
+
+        /**
+         * Expresion de la estructura
+         * @type {Expresion}
+        */
+        this.expresion = expresion;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitDeclaracionStruct(this);
+    }
+}
+    
+export class AsignacionStruct extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.tipo Tipo de la estructura
+ * @param {Expresion[]} options.atributos Atributos de la estructura
+    */
+    constructor({ tipo, atributos }) {
+        super();
+        
+        /**
+         * Tipo de la estructura
+         * @type {string}
+        */
+        this.tipo = tipo;
+
+
+        /**
+         * Atributos de la estructura
+         * @type {Expresion[]}
+        */
+        this.atributos = atributos;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAsignacionStruct(this);
+    }
+}
+    
+export class AccesoAtributo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.instancia Instancia del atributo
+ * @param {string[]} options.atributo Atributo a acceder
+    */
+    constructor({ instancia, atributo }) {
+        super();
+        
+        /**
+         * Instancia del atributo
+         * @type {string}
+        */
+        this.instancia = instancia;
+
+
+        /**
+         * Atributo a acceder
+         * @type {string[]}
+        */
+        this.atributo = atributo;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAccesoAtributo(this);
+    }
+}
+    
+export class AsignacionAtributo extends Expresion {
+
+    /**
+    * @param {Object} options
+    * @param {string} options.instancia Instancia del atributo
+ * @param {string[]} options.atributo Atributo a acceder
+ * @param {Expresion} options.expresion Expresion a asignar
+    */
+    constructor({ instancia, atributo, expresion }) {
+        super();
+        
+        /**
+         * Instancia del atributo
+         * @type {string}
+        */
+        this.instancia = instancia;
+
+
+        /**
+         * Atributo a acceder
+         * @type {string[]}
+        */
+        this.atributo = atributo;
+
+
+        /**
+         * Expresion a asignar
+         * @type {Expresion}
+        */
+        this.expresion = expresion;
+
+    }
+
+    /**
+     * @param {BaseVisitor} visitor
+     */
+    accept(visitor) {
+        return visitor.visitAsignacionAtributo(this);
+    }
+}
+    
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, ForEach, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz, FuncionForanea, Struct, DeclaracionStruct, AsignacionStruct, AccesoAtributo, AsignacionAtributo }

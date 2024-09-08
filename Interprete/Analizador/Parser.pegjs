@@ -37,7 +37,12 @@
         'AsignacionMatriz': Nodos.AsignacionMatriz, 
         'AccesoMatriz': Nodos.AccesoMatriz, 
         'ForEach': Nodos.ForEach,
-        'FuncionForanea': Nodos.FuncionForanea
+        'FuncionForanea': Nodos.FuncionForanea,
+        'Struct': Nodos.Struct,
+        'DeclaracionStruct': Nodos.DeclaracionStruct,
+        'AsignacionStruct': Nodos.AsignacionStruct,
+        'AccesoAtributo': Nodos.AccesoAtributo, 
+        'AsignacionAtributo': Nodos.AsignacionAtributo
     }
     const nodo = new tipos[TipoNodo](props)
     nodo.location = location()
@@ -48,21 +53,85 @@
 PROGRAMA = _ instrucciones:INSTRUCCIONES* _ 
             {return instrucciones}
 
-INSTRUCCIONES = declaracion:DECLARACION _
-            {return declaracion}
-            / sentencia:SENTENCIA _
+INSTRUCCIONES = sentencia:SENTENCIA _
             {return sentencia}
+            /declaracionStruct:INSTANCIASTRUCT
+            {return declaracionStruct}
+
+SENTENCIA =  bloque:BLOQUE
+            {return bloque}
+            /struct:STRUCT 
+            {return struct}
+            /funcionForanea:FUNCIONFORRANEA
+            {return funcionForanea}
+            / print_s:PRINT
+            {return print_s}
+            / if_1:IF
+            {return if_1}
+            /break_s:BREAK
+            {return break_s}
+            /continue_s:CONTUNUE
+            {return continue_s}
+            /return_s:RETURN
+            {return return_s}
+            / llamada:LLAMADA _ ";" _
+            {return llamada}
+            /asignacionAtributo:ASIGNACIONATRIBUTO
+            {return asignacionAtributo}
+            /asignacion:ASIGNACION
+            {return asignacion}
+            /asignacionArreglo:ASIGNACIONARREGLO
+            {return asignacionArreglo}
+            /asignacionMatriz:ASIGNACIONMATRIZ
+            {return asignacionMatriz}
+            /switch_s:SWITCH
+            {return switch_s}
+            /while_s:WHILE
+            {return while_s}
+            /for_s:FOR
+            {return for_s}
+            /foreach:FOREACH
+            {return foreach}
+                        /declaracion:DECLARACION 
+            {return declaracion}
+
+BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
+            {return NuevoNodo('Bloque', { sentencias }) }
 
 DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id, expresion })}
             / tipo:TIPO _ id:IDENTIFICADOR _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
-            /funcionForanea:FUNCIONFORRANEA
-            {return funcionForanea}
             /arreglo:ARREGLO
             {return arreglo}
             /matriz:MATRIZ
             {return matriz}
+
+STRUCT = "struct" _ id: IDENTIFICADOR _ "{" _ atributos:ATRIBUTO* _ "}" _ ";"? _ { return NuevoNodo('Struct', { id, atributos}) }
+
+ATRIBUTO = tipo: ("int"/"float"/"string"/"boolean"/"char"/IDENTIFICADOR) _ id: IDENTIFICADOR _ ";" _ 
+            { return { tipo, id } }
+
+INSTANCIASTRUCT =tipo:("var"/IDENTIFICADOR) _ id: IDENTIFICADOR _ "=" _ expresion: EXPRESION ";"? _ 
+            { return NuevoNodo('DeclaracionStruct', { tipo, id, expresion }) }
+
+ASIGNACIONSTRUCT = tipo: IDENTIFICADOR _ "{"_ atributos:( atri: LISTAATRIBUTOS _ atris:("," _ atr: LISTAATRIBUTOS { return atr })* _ { return [atri, ...atris] }) _ "}" 
+            { return NuevoNodo('AsignacionStruct', { tipo, atributos }) }
+
+LISTAATRIBUTOS = id: IDENTIFICADOR _ ":" _ expresion: EXPRESION _ 
+            { return { id, expresion } }
+
+ACCESONATRIBUTO = instancia: IDENTIFICADOR _ "." _ primerAtributo: IDENTIFICADOR _ resto: ("." _ atri: IDENTIFICADOR { return atri })*
+            { 
+                const atributo = [primerAtributo, ...resto];
+                return NuevoNodo('AccesoAtributo', { instancia, atributo });
+            }
+
+ASIGNACIONATRIBUTO = instancia: IDENTIFICADOR _ "." _ primerAtributo: IDENTIFICADOR _ resto: ("." _ atri: IDENTIFICADOR { return atri })* _ "=" _ expresion: EXPRESION _ ";"
+            { 
+                const atributo = [primerAtributo, ...resto];
+                return NuevoNodo('AsignacionAtributo', { instancia, atributo, expresion }) 
+            }
 
 
 FUNCIONFORRANEA = tipo:(TIPO/ "void") _ id:IDENTIFICADOR _ "(" _ parametros:PARAMETROS? _ ")" _ bloque:BLOQUE
@@ -90,34 +159,7 @@ VALORES = "{" _ valores:LISTAVALORES _ "}"
 LISTAVALORES = expresion1:EXPRESION _ valores:("," _ expresion:EXPRESION {return expresion})* 
             {return [expresion1, ...valores]}
 
-SENTENCIA =  if_1:IF
-            {return if_1}
-            / print_s:PRINT
-            {return print_s}
-            /bloque:BLOQUE
-            {return bloque}
-            /break_s:BREAK
-            {return break_s}
-            /continue_s:CONTUNUE
-            {return continue_s}
-            /return_s:RETURN
-            {return return_s}
-            / llamada:LLAMADA _ ";" _
-            {return llamada}
-            /asignacion:ASIGNACION
-            {return asignacion}
-            /asignacionArreglo:ASIGNACIONARREGLO
-            {return asignacionArreglo}
-            /asignacionMatriz:ASIGNACIONMATRIZ
-            {return asignacionMatriz}
-            /switch_s:SWITCH
-            {return switch_s}
-            /while_s:WHILE
-            {return while_s}
-            /for_s:FOR
-            {return for_s}
-            /foreach:FOREACH
-            {return foreach}
+
 
 IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -134,9 +176,6 @@ EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)*
             resto.forEach(([ , , , exp]) => expresiones.push(exp));
             return expresiones;
         }
-
-BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
-            {return NuevoNodo('Bloque', { sentencias }) }
 
 SWITCH = _"switch" _ "(" _ condicion:EXPRESION _ ")" _ "{" _ cases:SWITCHCASE* default1:DEFAULTCASE? _ "}" 
             {return NuevoNodo('Switch', { condicion, cases, default1 }) }
@@ -175,6 +214,9 @@ RETURN = _ "return" _ expresion:EXPRESION? _ ";" _
 ASIGNACION = id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', { id, asignacion }) }
 
+            /id:IDENTIFICADOR _ "=" _ asignacion:EXPRESION _
+            { return NuevoNodo('asignacion', { id, asignacion }) }
+
             /id:IDENTIFICADOR _ operador:("+="/"-=")_ expresion:EXPRESION _ ";" _ 
             { return NuevoNodo('asignacion', 
             { id, asignacion: NuevoNodo('OperacionBinaria', 
@@ -206,7 +248,7 @@ MATRIZ = tipo:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ val
             / tipo1:TIPO _ dimensiones:LISTADIMENSIONES _ id:IDENTIFICADOR _ "=" _ "new"_ tipo2:TIPO _ valores:VALORESMATRIZ _ ";" _
             {return NuevoNodo('DeclaracionMatriz2', {tipo1, dimensiones, id, tipo2, valores});}
 
-//DECLARACION MATRIZ CON VALORES
+
 LISTADIMENSIONES = _"[" _ "]"_ dimensiones:LISTADIMENSIONES? 
     {return [null].concat(dimensiones || []);}
 
@@ -231,7 +273,7 @@ LISTA_VALORES = _ "{" _ valores:LISTA_VALORES _ "}" valoresRestantes:(_ "," _ LI
 VALORESMATRIZ = _ "[" _ expresion:EXPRESION _ "]" _ resto:VALORESMATRIZ* 
             { return [expresion].concat(resto.flat());}
 
-EXPRESION =  ternario:TERNARIO
+EXPRESION = ternario:TERNARIO
             {return ternario}
             /booleano:BOOLEANO
             {return booleano}
@@ -243,6 +285,7 @@ EXPRESION =  ternario:TERNARIO
             {return caracter}
             / cadena:CADENA
             {return cadena}
+
 
 TERNARIO =  condicion:LOGICO _ "?" _ verdadero:LOGICO _ ":"_ falso:LOGICO _ 
             { return NuevoNodo('ternario', {condicion, verdadero, falso }) }
@@ -324,6 +367,8 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
         / embe:("toString")"(" _ expresion:OTRAEXPRESION _ ")" _
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
+        / embe:("Object.keys")"(" _ expresion:IDENTIFICADOR _ ")" _
+            {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
         / id:IDENTIFICADOR _ ".indexOf" _ "(" _ index:OTRAEXPRESION _ ")"
             {return NuevoNodo('IndexArreglo', {id, index})}
         / id:IDENTIFICADOR _ ".join()"
@@ -334,7 +379,9 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('AccesoMatriz', {id, valores})}
         / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
             {return NuevoNodo('AccesoArreglo', {id, index})}
+        / ACCESONATRIBUTO
         / LLAMADA
+        / OTRAEXPRESION
 
 LLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
     return parametros.reduce(
@@ -355,13 +402,17 @@ OTRAEXPRESION = decimal:DECIMAL
             {return entero}
             / booleano:BOOLEANO
             {return booleano}
+            / agrupacion:AGRUPACION
+            {return agrupacion}
+            / referenciaStruc:ASIGNACIONSTRUCT 
+            {return referenciaStruc}
+            / referenciaVariable:REFERENCIAVARIABLE
+            {return referenciaVariable}
             / caracter:CARACTER
             {return caracter}
             / cadena:CADENA
             {return cadena}
-            / agrupacion:AGRUPACION
-            {return agrupacion}
-            / referenciaVariable:REFERENCIAVARIABLE
+
 
 TIPO = "int" 
             {return text()}

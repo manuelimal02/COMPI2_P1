@@ -48,7 +48,7 @@ export const Embebidas = {
             throw new Error(`El Argumento De toLowerCase Debe Ser De Tipo String, Pero Se Recibió Un "${arg.tipo}".`);
         }
         return { valor: arg.valor.toUpperCase(), tipo: "string" };
-    }),
+    }), 
     
 };
 

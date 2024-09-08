@@ -114,6 +114,21 @@
 
  * @typedef {import('../Nodo/Nodos.js').FuncionForanea} FuncionForanea
 
+
+ * @typedef {import('../Nodo/Nodos.js').Struct} Struct
+
+
+ * @typedef {import('../Nodo/Nodos.js').DeclaracionStruct} DeclaracionStruct
+
+
+ * @typedef {import('../Nodo/Nodos.js').AsignacionStruct} AsignacionStruct
+
+
+ * @typedef {import('../Nodo/Nodos.js').AccesoAtributo} AccesoAtributo
+
+
+ * @typedef {import('../Nodo/Nodos.js').AsignacionAtributo} AsignacionAtributo
+
  */
 
 
@@ -463,6 +478,51 @@ export class BaseVisitor {
      */
     visitFuncionForanea(node) {
         throw new Error('Metodo visitFuncionForanea no implementado');
+    }
+    
+
+    /**
+     * @param {Struct} node
+     * @returns {any}
+     */
+    visitStruct(node) {
+        throw new Error('Metodo visitStruct no implementado');
+    }
+    
+
+    /**
+     * @param {DeclaracionStruct} node
+     * @returns {any}
+     */
+    visitDeclaracionStruct(node) {
+        throw new Error('Metodo visitDeclaracionStruct no implementado');
+    }
+    
+
+    /**
+     * @param {AsignacionStruct} node
+     * @returns {any}
+     */
+    visitAsignacionStruct(node) {
+        throw new Error('Metodo visitAsignacionStruct no implementado');
+    }
+    
+
+    /**
+     * @param {AccesoAtributo} node
+     * @returns {any}
+     */
+    visitAccesoAtributo(node) {
+        throw new Error('Metodo visitAccesoAtributo no implementado');
+    }
+    
+
+    /**
+     * @param {AsignacionAtributo} node
+     * @returns {any}
+     */
+    visitAsignacionAtributo(node) {
+        throw new Error('Metodo visitAsignacionAtributo no implementado');
     }
     
 }

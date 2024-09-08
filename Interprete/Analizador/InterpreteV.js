@@ -106,6 +106,12 @@ export class Interprete extends BaseVisitor {
     */
     visitReferenciaVariable(node) {
         const variable = this.entornoActual.getVariable(node.id);
+        if (variable == undefined) {
+            throw new Error(`La Variable: "${node.id}" No Está Definida.`);
+        }
+        if (Array.isArray(variable.valor)) {
+            return variable;
+        }
         return variable.valor;
     }
 
@@ -163,8 +169,6 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitWhile']}
     */
     visitWhile(node) {
-        console.log(node.condicion);
-        console.log(node.sentencias);
         const EntornoInicial = this.entornoActual;
         const condicion = node.condicion.accept(this);
         if (condicion.tipo !== 'boolean') {
@@ -191,6 +195,8 @@ export class Interprete extends BaseVisitor {
     visitSwitch(node) {
         const EntoronoInicial = this.entornoActual;
         let CasoEncontrado = false;
+        let CasoEjecutado = false;
+        let BreakEncontrado = false;
         try {
             for (const caso of node.cases) {
                 if (!CasoEncontrado && caso.valor.accept(this).valor === node.condicion.accept(this).valor) {
@@ -198,11 +204,13 @@ export class Interprete extends BaseVisitor {
                 }
                 if (CasoEncontrado) {
                     this.entornoActual = new Entorno(EntoronoInicial);
+                    CasoEjecutado = true;
                     for (const SentenciasBloque of caso.bloquecase) {
                         try {
                             SentenciasBloque.accept(this);
                         } catch (error) {
                             if (error instanceof BreakException) {
+                                BreakEncontrado = true;
                                 return;
                             } else if (error instanceof ContinueException) {
                                 break;
@@ -213,7 +221,23 @@ export class Interprete extends BaseVisitor {
                     }
                 }
             }
-            if (!CasoEncontrado && node.default1) {
+            if (CasoEjecutado && !BreakEncontrado && node.default1) {
+                this.entornoActual = new Entorno(EntoronoInicial);
+                for (const SentenciasBloque of node.default1.sentencias) {
+                    try {
+                        SentenciasBloque.accept(this);
+                    } catch (error) {
+                        if (error instanceof BreakException) {
+                            return;
+                        } else if (error instanceof ContinueException) {
+                            break;
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
+            }
+            if (!CasoEjecutado && node.default1) {
                 this.entornoActual = new Entorno(EntoronoInicial);
                 for (const SentenciasBloque of node.default1.sentencias) {
                     try {
@@ -306,6 +330,27 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitEmbebida']}
      */ 
     visitEmbebida(node) {
+        if (node.Nombre === "Object.keys") {
+            const ValorStruct = this.entornoActual.getVariable(node.Argumento);
+            if (!ValorStruct) {
+                throw new Error(`La variable ${node.Argumento} no existe en el entorno actual.`);
+            }
+            const TipoStruct = this.entornoActual.getStruct(ValorStruct.tipo);
+            if (!TipoStruct) {
+                throw new Error(`El tipo de estructura ${ValorStruct.tipo} no está definido.`);
+            }
+            let salida = "";
+            for (let i = 0; i < TipoStruct.atributos.length; i++) {
+                const atributo = TipoStruct.atributos[i].id;
+                if (i < TipoStruct.atributos.length - 1) {
+                    salida += atributo + ",";
+                } else {
+                    salida += atributo;
+                }
+            }
+            return { valor: salida, tipo: "string" };
+        }
+        
         const expresion = node.Argumento.accept(this);
         const NombreFuncion = node.Nombre;
         switch (NombreFuncion) {
@@ -322,10 +367,17 @@ export class Interprete extends BaseVisitor {
                     case "boolean": 
                         return {valor: expresion.tipo, tipo: "string" };    
                     default:
-                        throw new Error(`El Argumento De typeof Es Tipo Desconocido: "${arg.tipo}".`);
+                        const TipoStruct = this.entornoActual.getStruct(expresion.tipo);
+                        if (!TipoStruct) {
+                            throw new Error(`El Argumento De typeof Es Tipo Desconocido: "${expresion.tipo}".`);
+                        }else{
+                            return {valor: expresion.tipo, tipo: "string"};
+                        }   
                     }
             case 'toString':
-                return {valor: expresion.valor.toString(), tipo: "string"};
+                return {valor: expresion.valor.toString(), tipo: "string"};     
+            default:
+                throw new Error(`La Función Embebida "${NombreFuncion}" No Existe.`);
         }
     }
 
@@ -565,7 +617,6 @@ export class Interprete extends BaseVisitor {
         }
         const NuevaMatriz = crearMatriz(node.valores, node.tipo1, ValorPorDefecto);
         this.entornoActual.setVariable(node.tipo1, node.id, NuevaMatriz);
-        console.log(this.entornoActual);
     }
 
     /**
@@ -685,6 +736,101 @@ export class Interprete extends BaseVisitor {
         }
         const funcion = new Foranea(node, this.entornoActual);
         this.entornoActual.setVariable(node.tipo, node.id, funcion);
-        console.log(this.entornoActual);
     }
-}    
+
+    /**
+     * @type {BaseVisitor['visitStruct']}
+     */
+    visitStruct(node) {
+        let AtrubutosStruct = [];
+        node.atributos.forEach(atributo => {
+            const tipo = atributo.tipo;
+            const id = atributo.id;
+            if(this.entornoActual.getVariable(id)) {
+                throw new Error(`Variable ${id} no puede ser un atributo para un struct `)
+            }
+            if(tipo != "int" && tipo != "string" && tipo != "float" && tipo != "boolean" && tipo != "char" ) {
+                if(!this.entornoActual.getStruct(tipo)) throw new Error(`El struct ${id} no esta definido`) 
+            }
+            if(AtrubutosStruct.some(item => item.id == id)) throw new Error(`Atributo ${id} ya esta declarado en el struct`)
+            AtrubutosStruct.push({tipo, id})
+        });
+        this.entornoActual.setStruct(node.id, AtrubutosStruct);
+    }
+
+    /**
+     * @type {BaseVisitor['visitDeclaracionStruct']}
+     */
+    visitDeclaracionStruct(node) {
+        let tipo = node.tipo
+        const expresion = node.expresion.accept(this)
+        if (tipo === "var"){
+            tipo = expresion.tipo
+        }
+        if (tipo != expresion.tipo) {
+            throw new Error(`El tipo de la instancia no coincide con el tipo del struct`)
+        }
+        if (this.entornoActual.getVariable(node.id)) {
+            throw new Error(`El id ${node.id} no es un struct`)
+        }
+        this.entornoActual.setVariable(tipo, node.id, expresion)
+        console.log(this.entornoActual)
+    }
+    
+    /**
+     * @type {BaseVisitor['visitAsignacionStruct']}
+     */
+    visitAsignacionStruct(node) {
+        const tipo = node.tipo
+        const atributos = node.atributos
+        const TipoStruct = this.entornoActual.getStruct(tipo)
+        let StructTemporal = {}
+        atributos.forEach(atributo => {
+            const id = atributo.id
+            if (!TipoStruct.atributos.some(item => item.id == id)){
+                throw new Error(`El atributo ${id} no esta definido en el struct`)
+            }
+            const valor = atributo.expresion.accept(this)
+            if (TipoStruct.atributos.find(item => item.id == id).tipo !== valor.tipo) {
+                if (!(TipoStruct.atributos.find(item => item.id == id).tipo === "float" && valor.tipo === "int")) {
+                    throw new Error(`El tipo del valor no coincide con el tipo del atributo ${id}`)
+                }
+            }
+            StructTemporal[id] = valor
+        });
+        return {valor: StructTemporal, tipo: tipo}
+    }
+
+    /**
+     * @type {BaseVisitor['visitAccesoAtributo']}
+     */
+    visitAccesoAtributo(node) {
+        const instancia = node.instancia;
+        const atributos = node.atributo;
+        let Struct = this.entornoActual.getVariable(instancia);
+        if (Struct === undefined) {
+            throw new Error(`La variable ${instancia} no es un struct o no existe`);
+        }
+        let ref = Struct.valor;
+        for (let i = 0; i < atributos.length; i++) {
+            const atributo = atributos[i];
+            if (!ref.valor[atributo]) {
+                throw new Error(`El atributo ${atributo} no está definido en el struct ${instancia}`);
+            }
+            ref = ref.valor[atributo];
+        }
+        return { valor: ref.valor, tipo: ref.tipo };
+    }
+
+    /**
+     * @type {BaseVisitor['visitAsignacionAtributo']}
+     */
+    visitAsignacionAtributo(node) {
+        const instancia = node.instancia;
+        const atributos = node.atributo;
+        const valor = node.expresion.accept(this);
+        this.entornoActual.assignStruct(instancia, atributos, valor);
+        console.log(this.entornoActual)
+        return;
+    }
+} 
