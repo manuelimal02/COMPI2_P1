@@ -1387,47 +1387,6 @@ export class Struct extends Expresion {
     }
 }
     
-export class DeclaracionStruct extends Expresion {
-
-    /**
-    * @param {Object} options
-    * @param {string} options.tipo Tipo de la estructura
- * @param {string} options.id Identificador de la estructura
- * @param {Expresion} options.expresion Expresion de la estructura
-    */
-    constructor({ tipo, id, expresion }) {
-        super();
-        
-        /**
-         * Tipo de la estructura
-         * @type {string}
-        */
-        this.tipo = tipo;
-
-
-        /**
-         * Identificador de la estructura
-         * @type {string}
-        */
-        this.id = id;
-
-
-        /**
-         * Expresion de la estructura
-         * @type {Expresion}
-        */
-        this.expresion = expresion;
-
-    }
-
-    /**
-     * @param {BaseVisitor} visitor
-     */
-    accept(visitor) {
-        return visitor.visitDeclaracionStruct(this);
-    }
-}
-    
 export class AsignacionStruct extends Expresion {
 
     /**
@@ -1535,4 +1494,4 @@ export class AsignacionAtributo extends Expresion {
     }
 }
     
-export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, ForEach, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz, FuncionForanea, Struct, DeclaracionStruct, AsignacionStruct, AccesoAtributo, AsignacionAtributo }
+export default { Expresion, OperacionBinaria, OperacionUnaria, Agrupacion, Entero, Decimal, Cadena, Caracter, Booleano, DeclaracionVar, ReferenciaVariable, Print, Ternario, Asignacion, Bloque, If, While, Switch, For, ForEach, Break, Continue, Return, Llamada, Embebida, DeclaracionArreglo1, DeclaracionArreglo2, DeclaracionArreglo3, IndexArreglo, JoinArreglo, LengthArreglo, AccesoArreglo, AsignacionArreglo, DeclaracionMatriz1, DeclaracionMatriz2, AsignacionMatriz, AccesoMatriz, FuncionForanea, Struct, AsignacionStruct, AccesoAtributo, AsignacionAtributo }

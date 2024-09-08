@@ -118,9 +118,6 @@
  * @typedef {import('../Nodo/Nodos.js').Struct} Struct
 
 
- * @typedef {import('../Nodo/Nodos.js').DeclaracionStruct} DeclaracionStruct
-
-
  * @typedef {import('../Nodo/Nodos.js').AsignacionStruct} AsignacionStruct
 
 
@@ -487,15 +484,6 @@ export class BaseVisitor {
      */
     visitStruct(node) {
         throw new Error('Metodo visitStruct no implementado');
-    }
-    
-
-    /**
-     * @param {DeclaracionStruct} node
-     * @returns {any}
-     */
-    visitDeclaracionStruct(node) {
-        throw new Error('Metodo visitDeclaracionStruct no implementado');
     }
     
 

@@ -96,6 +96,22 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitDeclaracionVar']}
     */
     visitDeclaracionVar(node) {
+        if (node.expresion instanceof Nodos.AsignacionStruct) {
+            let tipo = node.tipo
+            const expresion = node.expresion.accept(this)
+            if (tipo === "var"){
+                tipo = expresion.tipo
+            }
+            if (tipo != expresion.tipo) {
+                throw new Error(`El tipo de la instancia no coincide con el tipo del struct`)
+            }
+            if (this.entornoActual.getVariable(node.id)) {
+                throw new Error(`El id ${node.id} no es un struct`)
+            }
+            this.entornoActual.setVariable(tipo, node.id, expresion)
+            console.log(this.entornoActual)
+            return
+        }
         const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, this);
         DeclaracionHandler.EjecutarHandler();
     }
@@ -108,9 +124,6 @@ export class Interprete extends BaseVisitor {
         const variable = this.entornoActual.getVariable(node.id);
         if (variable == undefined) {
             throw new Error(`La Variable: "${node.id}" No Está Definida.`);
-        }
-        if (Array.isArray(variable.valor)) {
-            return variable;
         }
         return variable.valor;
     }
@@ -758,25 +771,6 @@ export class Interprete extends BaseVisitor {
         this.entornoActual.setStruct(node.id, AtrubutosStruct);
     }
 
-    /**
-     * @type {BaseVisitor['visitDeclaracionStruct']}
-     */
-    visitDeclaracionStruct(node) {
-        let tipo = node.tipo
-        const expresion = node.expresion.accept(this)
-        if (tipo === "var"){
-            tipo = expresion.tipo
-        }
-        if (tipo != expresion.tipo) {
-            throw new Error(`El tipo de la instancia no coincide con el tipo del struct`)
-        }
-        if (this.entornoActual.getVariable(node.id)) {
-            throw new Error(`El id ${node.id} no es un struct`)
-        }
-        this.entornoActual.setVariable(tipo, node.id, expresion)
-        console.log(this.entornoActual)
-    }
-    
     /**
      * @type {BaseVisitor['visitAsignacionStruct']}
      */

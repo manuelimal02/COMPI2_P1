@@ -55,8 +55,8 @@ PROGRAMA = _ instrucciones:INSTRUCCIONES* _
 
 INSTRUCCIONES = sentencia:SENTENCIA _
             {return sentencia}
-            /declaracionStruct:INSTANCIASTRUCT
-            {return declaracionStruct}
+            /declaracion:DECLARACION 
+            {return declaracion}
 
 SENTENCIA =  bloque:BLOQUE
             {return bloque}
@@ -92,19 +92,19 @@ SENTENCIA =  bloque:BLOQUE
             {return for_s}
             /foreach:FOREACH
             {return foreach}
-                        /declaracion:DECLARACION 
-            {return declaracion}
 
 BLOQUE = "{" _ sentencias:INSTRUCCIONES* _ "}" 
             {return NuevoNodo('Bloque', { sentencias }) }
 
-DECLARACION = tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
+DECLARACION = tipo:(IDENTIFICADOR/"var") _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
+            {return NuevoNodo('DeclaracionVar', {tipo, id, expresion })}
+            /tipo:TIPO _ id:IDENTIFICADOR _ "=" _ expresion:EXPRESION _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id, expresion })}
             / tipo:TIPO _ id:IDENTIFICADOR _ ";" _
             {return NuevoNodo('DeclaracionVar', {tipo, id })}
-            /arreglo:ARREGLO
+            /arreglo:ARREGLO _
             {return arreglo}
-            /matriz:MATRIZ
+            /matriz:MATRIZ _
             {return matriz}
 
 STRUCT = "struct" _ id: IDENTIFICADOR _ "{" _ atributos:ATRIBUTO* _ "}" _ ";"? _ { return NuevoNodo('Struct', { id, atributos}) }
