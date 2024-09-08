@@ -40,7 +40,6 @@ export class DeclaracionVariableHandler {
             case 'string': return {valor: '', tipo: 'string'};
             case 'boolean': return {valor: true, tipo: 'boolean'};
             case 'char': return {valor: '\0', tipo: 'char'};
-            case 'var': return {valor: null, tipo: 'var'};
             default: throw new Error(`Tipo De Variable: "${tipo}" No Válido.`);
         }
     }
@@ -50,7 +49,6 @@ export class DeclaracionVariableHandler {
         if (tipoInferido === 'float' && valor.tipo === 'int' || tipoInferido === 'float' && valor.tipo === 'float') {
             valor.tipo = 'float';
             entorno.setVariable(tipoInferido, this.nombre, valor);
-            console.log('Variable Declarada:', this.nombre, valor);
             return;
         }
         if (tipoInferido === valor.tipo) {

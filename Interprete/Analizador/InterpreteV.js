@@ -109,11 +109,11 @@ export class Interprete extends BaseVisitor {
                 throw new Error(`El id ${node.id} no es un struct`)
             }
             this.entornoActual.setVariable(tipo, node.id, expresion)
-            console.log(this.entornoActual)
             return
         }
         const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, this);
         DeclaracionHandler.EjecutarHandler();
+        console.log(this.entornoActual)
     }
     
 
@@ -406,7 +406,8 @@ export class Interprete extends BaseVisitor {
             }
             arreglo.push(valor.valor);
         }
-        this.entornoActual.setVariable(node.tipo, node.id, arreglo);
+        this.entornoActual.setVariable(node.tipo, node.id, {valor: arreglo, tipo: node.tipo});
+        console.log(this.entornoActual)
     }
 
     /**
@@ -444,28 +445,30 @@ export class Interprete extends BaseVisitor {
             default:
                 throw new Error(`Tipo De Arreglo No Válido: "${node.tipo1}".`);
         }
-        this.entornoActual.setVariable(node.tipo1, node.id, arreglo);
+        this.entornoActual.setVariable(node.tipo1, node.id, {valor: arreglo, tipo: node.tipo});
+        console.log(this.entornoActual)
     }
 
     /**
      * @type {BaseVisitor['visitDeclaracionArreglo3']}
      */ 
     visitDeclaracionArreglo3(node) {
-        const valores = this.entornoActual.getVariable(node.id2);
+        const valores = this.entornoActual.getVariable(node.id2).valor;
         if (!Array.isArray(valores.valor)) {
             throw new Error(`La Variable "${node.id2}" No Es Un Arreglo.`);
         }
         if (valores.tipo !== node.tipo) {
             throw new Error(`El Tipo Del Arreglo "${valores.tipo}" No Coincide Con El Tipo Del Arreglo "${node.tipo}".`);
         }
-        this.entornoActual.setVariable(node.tipo, node.id1, valores.valor.slice());
+        this.entornoActual.setVariable(node.tipo, node.id1, {valor: valores.valor.slice(), tipo: node.tipo});
+        console.log(this.entornoActual)
     }
 
     /**
      * @type {BaseVisitor['visitIndexArreglo']}
      */
     visitIndexArreglo(node) {
-        const arreglo = this.entornoActual.getVariable(node.id);
+        const arreglo = this.entornoActual.getVariable(node.id).valor;
         const index = node.index.accept(this)
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
@@ -486,7 +489,7 @@ export class Interprete extends BaseVisitor {
      */
     visitJoinArreglo(node) {
         let cadena ="";
-        const arreglo = this.entornoActual.getVariable(node.id);
+        const arreglo = this.entornoActual.getVariable(node.id).valor;
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
         }
@@ -503,7 +506,7 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitLengthArreglo']}
      */
     visitLengthArreglo(node) {
-        const arreglo = this.entornoActual.getVariable(node.id);
+        const arreglo = this.entornoActual.getVariable(node.id).valor;
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
         }
@@ -514,7 +517,7 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitAccesoArreglo']}
      */
     visitAccesoArreglo(node) {
-        const arreglo = this.entornoActual.getVariable(node.id);
+        const arreglo = this.entornoActual.getVariable(node.id).valor;
         const index = node.index.accept(this)
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
@@ -534,7 +537,7 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitAsignacionArreglo']}
      */
     visitAsignacionArreglo(node) {
-        const arreglo = this.entornoActual.getVariable(node.id);
+        const arreglo = this.entornoActual.getVariable(node.id).valor;
         const index = node.index.accept(this);
         const valor = node.valor.accept(this);
         if (!Array.isArray(arreglo.valor)) {
@@ -573,7 +576,8 @@ export class Interprete extends BaseVisitor {
             return Matriz;
         };
         const NuevaMatriz = RecorrerMatriz(node.valores, node.tipo);
-        this.entornoActual.setVariable(node.tipo, node.id, NuevaMatriz);
+        this.entornoActual.setVariable(node.tipo, node.id, {valor: NuevaMatriz, tipo: node.tipo});
+        console.log(this.entornoActual)
     }
 
     /**
@@ -629,14 +633,15 @@ export class Interprete extends BaseVisitor {
                 throw new Error(`Tipo De Matriz No Válido: "${node.tipo1}".`);
         }
         const NuevaMatriz = crearMatriz(node.valores, node.tipo1, ValorPorDefecto);
-        this.entornoActual.setVariable(node.tipo1, node.id, NuevaMatriz);
+        this.entornoActual.setVariable(node.tipo1, node.id, {valor: NuevaMatriz, tipo: node.tipo1});
+        console.log(this.entornoActual)
     }
 
     /**
      * @type {BaseVisitor['visitAsignacionMatriz']}
      */
     visitAsignacionMatriz(node) {
-        const matriz = this.entornoActual.getVariable(node.id);
+        const matriz = this.entornoActual.getVariable(node.id).valor;
         const nuevoValor = node.NuevoDato.accept(this);
         // Verificar si la variable es una matriz
         if (!Array.isArray(matriz.valor)) {
@@ -673,8 +678,7 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitAccesoMatriz']}
      */
     visitAccesoMatriz(node) {
-        const matriz = this.entornoActual.getVariable(node.id);
-        
+        const matriz = this.entornoActual.getVariable(node.id).valor;
         if (!Array.isArray(matriz.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Una Matriz.`);
         }
@@ -824,7 +828,6 @@ export class Interprete extends BaseVisitor {
         const atributos = node.atributo;
         const valor = node.expresion.accept(this);
         this.entornoActual.assignStruct(instancia, atributos, valor);
-        console.log(this.entornoActual)
         return;
     }
 } 

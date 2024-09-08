@@ -112,9 +112,6 @@ STRUCT = "struct" _ id: IDENTIFICADOR _ "{" _ atributos:ATRIBUTO* _ "}" _ ";"? _
 ATRIBUTO = tipo: ("int"/"float"/"string"/"boolean"/"char"/IDENTIFICADOR) _ id: IDENTIFICADOR _ ";" _ 
             { return { tipo, id } }
 
-INSTANCIASTRUCT =tipo:("var"/IDENTIFICADOR) _ id: IDENTIFICADOR _ "=" _ expresion: EXPRESION ";"? _ 
-            { return NuevoNodo('DeclaracionStruct', { tipo, id, expresion }) }
-
 ASIGNACIONSTRUCT = tipo: IDENTIFICADOR _ "{"_ atributos:( atri: LISTAATRIBUTOS _ atris:("," _ atr: LISTAATRIBUTOS { return atr })* _ { return [atri, ...atris] }) _ "}" 
             { return NuevoNodo('AsignacionStruct', { tipo, atributos }) }
 
