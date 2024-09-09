@@ -1,9 +1,11 @@
 export class DeclaracionVariableHandler {
-    constructor(tipo, nombre, expresion, entornoActual, visitor) {
+    constructor(tipo, nombre, expresion, entornoActual, linea, columna, visitor) {
         this.tipo = tipo;
         this.nombre = nombre;
         this.expresion = expresion;
         this.entornoActual = entornoActual;
+        this.linea = linea;
+        this.columna = columna;
         this.visitor = visitor;
     }
 

@@ -1,3 +1,4 @@
+import { Foranea } from "../Instruccion/Foranea.js";
 export class Entorno {
     /**
      * @param {Entorno} padre
@@ -159,4 +160,29 @@ export class Entorno {
         }
         StructPadre[UltimoAtributo] = valor;
     }
+
+    RetornarEntorno() {
+        let Simbolos = [];
+        const agregarSimbolos = (entorno) => {
+            for (const key in entorno.valores) {
+                if (Object.hasOwnProperty.call(entorno.valores, key)) {
+                    const element = entorno.valores[key];
+                    if (element.tipo === "funcion") {
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa" });
+                    } else if (element.valor instanceof Foranea) {
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea" });
+                    } else {
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor });
+                    }
+                }
+            }
+        };
+        agregarSimbolos(this);
+        let entornoPadre = this.padre;
+        while (entornoPadre) {
+            agregarSimbolos(entornoPadre);
+        }
+        return Simbolos;
+    }
+    
 }

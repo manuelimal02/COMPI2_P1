@@ -5,7 +5,6 @@ import { OperacionBinariaHandler } from "../Instruccion/OperacionBinaria.js";
 import { OperacionUnariaHandler } from "../Instruccion/OperacionUnaria.js";
 import { TernarioHandler } from "../Instruccion/Ternario.js";
 import { IfHandler } from "../Instruccion/SentenciaIF.js";
-import { Expresion } from "../Nodo/Nodos.js";
 import { Embebidas } from "../Instruccion/Embebida.js";
 import { Invocable } from "../Instruccion/Invocable.js";
 import { BreakException, ContinueException, ReturnException } from "../Instruccion/Transferencia.js";
@@ -111,6 +110,8 @@ export class Interprete extends BaseVisitor {
             this.entornoActual.setVariable(tipo, node.id, expresion)
             return
         }
+        console.log("Linea", node.location.start.line)
+        console.log("Columna",node.location.start.column)
         const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, this);
         DeclaracionHandler.EjecutarHandler();
         console.log(this.entornoActual)
@@ -336,7 +337,8 @@ export class Interprete extends BaseVisitor {
         if (funcion.aridad() !== argumentos.length) {
             throw new Error(`La función: "${node.callee.id}" espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}.`);
         }
-        if (funcion.aridad() > 0) {
+        if (funcion.aridad() > 0 && funcion.node) {
+            console.log(funcion.node)
             funcion.node.parametros.forEach((param, i) => {
                 const argumento = argumentos[i];
                 if (param.tipo !== argumento.tipo) {

@@ -1,4 +1,5 @@
 let UltimoAST = null;
+let TablaDeSimbolosGeneral = [];
 import { parse } from '../Interprete/Analizador/Parser.js';
 import { Interprete } from '../Interprete/Analizador/InterpreteV.js';
 
@@ -77,10 +78,78 @@ export function FuncionArchivo() {
     }
 
     function TablaSimbolosHTML() {
-        const interprete = new Interprete();
-        console.log("Tabla De Simbolos");
-        console.log(interprete.entornoActual);
+        if (TablaDeSimbolosGeneral.length === 0) {
+            alert('Debe Ejecutar Un Archivo De Entrada.');
+            return;
+        }
+        let contenidoHTML = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tabla De Símbolos</title>
+            <style>
+                body {
+                    font-family: 'Courier New', Courier, monospace;
+                    text-align: center;
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    background-color: #f0f0f0;
+                    padding: 20px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f2f2f2;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Tabla De Símbolos</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        TablaDeSimbolosGeneral.forEach(simbolo => {
+            contenidoHTML += `
+            <tr>
+                <td>${simbolo.nombre}</td>
+                <td>${simbolo.tipo}</td>
+                <td>${simbolo.valor}</td>
+            </tr>
+            `;
+        });
+        contenidoHTML += `
+            </tbody>
+            </table>
+        <h3>Carlos Manuel Lima y Lima - 202201524 - Tabla De Simbolos - Proyecto 1 - OLC2</h3>
+        </body>
+        </html>
+        `;
+    
+        // Crear un Blob con el contenido HTML
+        const blob = new Blob([contenidoHTML], { type: 'text/html' });
+        const enlace = document.createElement('a');
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = "TablaDeSimbolos.html"; // Nombre del archivo
+        enlace.click(); // Descargar archivo
     }
+    
 
     AbrirArchivo.addEventListener('click', () => {
         fileInput.click();
@@ -153,9 +222,9 @@ export function FuncionInterprete() {
     
         salida.value = interprete.salida;
         ActualizarNumeroLinea(salida, LNSalida);
+        TablaDeSimbolosGeneral = interprete.entornoActual.RetornarEntorno();
     }
     
-
     entrada.addEventListener('input', manejarEntrada);
     entrada.addEventListener('scroll', () => sincronizarScroll(entrada, LNEntrada));
     salida.addEventListener('scroll', () => sincronizarScroll(salida, LNSalida));
