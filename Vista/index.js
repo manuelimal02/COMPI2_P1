@@ -9,6 +9,7 @@ export function FuncionArchivo() {
     const AbrirArchivo = document.getElementById('AbrirArchivo');
     const CrearArchivo = document.getElementById('CrearArchivo');
     const GuardarArchivo = document.getElementById('GuardarArchivo');
+    const TablaSimbolos = document.getElementById('TablaSimbolos');
 
     function FuncionAbrirArchivo(evento) {
         const archivo = evento.target.files[0];
@@ -34,10 +35,15 @@ export function FuncionArchivo() {
 
     function handleNuevoArchivo() {
         if (entrada.value.trim() !== "") {
-            const debeGuardar = confirm("¿Desea Guardar El Archivo Actual?");
+            const debeGuardar = confirm("¿Desea Crear Un Archivo Con El Contenido Actual?");
             if (debeGuardar) {
-                handleGuardarArchivo();
+                const nombreArchivo = prompt("Ingrese Nombre De Archivo .OAK", "CrearArchivo.oak");
+                if (nombreArchivo) {
+                    ContenidoArchivo(entrada.value, nombreArchivo);
+                }
             }
+        }else{
+            alert("No Hay Contenido Para Crear.");
         }
         entrada.value = "";
         salida.value = "";
@@ -45,10 +51,23 @@ export function FuncionArchivo() {
         ActualizarNumeroLinea(salida, document.getElementById('lnSalida'));
     }
 
-    function handleGuardarArchivo() {
-        const nombreArchivo = prompt("Ingrese Nombre De Archivo .OAK", "GuardarArchivo.oak");
-        if (nombreArchivo) {
-            ContenidoArchivo(entrada.value, nombreArchivo);
+    async function handleGuardarArchivo() {
+        try {
+            const options = {
+                types: [{
+                    description: 'Archivo OakLang',
+                    accept: { 'text/plain': ['.oak'] }
+                }],
+                suggestedName: 'GuardarArchivo.oak'
+            };
+            const archivoHandler = await window.showSaveFilePicker(options);
+            const stream = await archivoHandler.createWritable();
+            await stream.write(entrada.value);
+            await stream.close();
+    
+            alert('Archivo Guardado Exitosamente.');
+        } catch (error) {
+            console.error('Error Al Guardar El Archivo:', error);
         }
     }
 
@@ -57,21 +76,28 @@ export function FuncionArchivo() {
         numerosLinea.innerHTML = Array.from({ length: lineas }, (_, i) => i + 1).join('<br>');
     }
 
+    function TablaSimbolosHTML() {
+        const interprete = new Interprete();
+        console.log("Tabla De Simbolos");
+        console.log(interprete.entornoActual);
+    }
+
     AbrirArchivo.addEventListener('click', () => {
-        console.log('Abrir Archivo');
         fileInput.click();
     });
 
     fileInput.addEventListener('change', FuncionAbrirArchivo);
 
     CrearArchivo.addEventListener('click', () => {
-        console.log('Crear Archivo');
         handleNuevoArchivo();
     });
 
     GuardarArchivo.addEventListener('click', () => {
-        console.log('Guardar Archivo');
         handleGuardarArchivo();
+    });
+
+    TablaSimbolos.addEventListener('click', () => {
+        TablaSimbolosHTML();
     });
 }
 
