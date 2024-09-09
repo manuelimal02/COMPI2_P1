@@ -772,13 +772,13 @@ export class Interprete extends BaseVisitor {
         node.atributos.forEach(atributo => {
             const tipo = atributo.tipo;
             const id = atributo.id;
-            if(this.entornoActual.getVariable(id)) {
-                throw new Error(`Variable ${id} no puede ser un atributo para un struct `)
+            if(tipo === "var") {
+                throw new Error(`El Tipo "var" No Es Permitido Para El Atributo: "${id}".`);
             }
             if(tipo != "int" && tipo != "string" && tipo != "float" && tipo != "boolean" && tipo != "char" ) {
-                if(!this.entornoActual.getStruct(tipo)) throw new Error(`El struct ${id} no esta definido`) 
+                if(!this.entornoActual.getStruct(tipo)) throw new Error(`El Struct "${id}" No Está Definido.`) 
             }
-            if(AtrubutosStruct.some(item => item.id == id)) throw new Error(`Atributo ${id} ya esta declarado en el struct`)
+            if(AtrubutosStruct.some(item => item.id == id)) throw new Error(`El Atributo "${id}" Ya Está Declarado En El Struct.`)
             AtrubutosStruct.push({tipo, id})
         });
         this.entornoActual.setStruct(node.id, AtrubutosStruct);
@@ -795,12 +795,12 @@ export class Interprete extends BaseVisitor {
         atributos.forEach(atributo => {
             const id = atributo.id
             if (!TipoStruct.atributos.some(item => item.id == id)){
-                throw new Error(`El atributo ${id} no esta definido en el struct`)
+                throw new Error(`El Atributo: "${id}" No Está Definido En EL Struct: "${TipoStruct.nombre}".`);
             }
             const valor = atributo.expresion.accept(this)
             if (TipoStruct.atributos.find(item => item.id == id).tipo !== valor.tipo) {
                 if (!(TipoStruct.atributos.find(item => item.id == id).tipo === "float" && valor.tipo === "int")) {
-                    throw new Error(`El tipo del valor no coincide con el tipo del atributo ${id}`)
+                    throw new Error(`El Tipo del Valor: "${valor.valor}" No Coincide Con El Tipo Del Atributo: "${id}".`)
                 }
             }
             StructTemporal[id] = valor
@@ -816,13 +816,13 @@ export class Interprete extends BaseVisitor {
         const atributos = node.atributo;
         let Struct = this.entornoActual.getVariable(instancia);
         if (Struct === undefined) {
-            throw new Error(`La variable ${instancia} no es un struct o no existe`);
+            throw new Error(`El Struct ${instancia} Está Definido.`);
         }
         let ref = Struct.valor;
         for (let i = 0; i < atributos.length; i++) {
             const atributo = atributos[i];
             if (!ref.valor[atributo]) {
-                throw new Error(`El atributo ${atributo} no está definido en el struct ${instancia}`);
+                throw new Error(`El Atributo: "${atributo}" No Está Definido En El struct "${instancia}".`);
             }
             ref = ref.valor[atributo];
         }

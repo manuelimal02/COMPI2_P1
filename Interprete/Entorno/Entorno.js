@@ -83,10 +83,10 @@ export class Entorno {
     //Manejo De Structs
     setStruct(nombre, atributos) {
         if(this.valores[nombre]) {
-            throw new Error(`ID ${nombre} ya esta declarado.`)
+            throw new Error(`La Variable: "${nombre}" Ya Está Declarada.`)
         }
         if(this.structs[nombre]){
-            throw new Error(`Estructura ${nombre} ya esta declarada.`)
+            throw new Error(`El Struc: "${nombre}" Ya Está Declarado.`)
         }
         this.structs[nombre] = {nombre, atributos}
     }
@@ -105,87 +105,58 @@ export class Entorno {
     }
 
     assignStruct(nombre, atributos, valor) {
-        // Obtener la estructura principal
-        let current = this.valores[nombre];
-        
-        // Verificar si la estructura principal existe
-        if (!current) {
-            throw new Error(`La estructura "${nombre}" no está definida.`);
+        let StructActual = this.valores[nombre];
+        if (!StructActual) {
+            throw new Error(`El Struc: "${nombre}" No Está Definido.`);
         }
-    
-        // Inicializar el puntero al objeto actual y el tipo de estructura actual
-        let parent = current.valor.valor;
-        let currentType = current.tipo;
-    
-        // Navegar a través de los atributos intermedios
+        let StructPadre = StructActual.valor.valor;
+        let StructTipo = StructActual.tipo;
         for (let i = 0; i < atributos.length - 1; i++) {
-            // Obtener la definición de la estructura actual
-            const structDef = this.getStruct(currentType);
-            if (!structDef) {
-                throw new Error(`Definición de estructura no encontrada para "${currentType}".`);
+            const DefinicionStruct = this.getStruct(StructTipo);
+            if (!DefinicionStruct) {
+                throw new Error(`Definición De Struct No Encontrada Para: "${StructTipo}".`);
             }
-    
-            // Verificar si el atributo actual existe en la definición de la estructura
-            const atributo = structDef.atributos.find(attr => attr.id === atributos[i]);
+            const atributo = DefinicionStruct.atributos.find(attr => attr.id === atributos[i]);
             if (!atributo) {
-                throw new Error(`El atributo "${atributos[i]}" no está definido en la estructura "${currentType}".`);
+                throw new Error(`El Atributo: "${atributos[i]}" No Está Definido En EL Struct: "${StructTipo}".`);
             }
-    
-            // Si el atributo intermedio no existe, inicializarlo
-            if (!parent[atributos[i]]) {
-                parent[atributos[i]] = { 
+            if (!StructPadre[atributos[i]]) {
+                StructPadre[atributos[i]] = { 
                     valor: {}, 
                     tipo: atributo.tipo 
                 };
             }
-    
-            // Avanzar al siguiente nivel de la estructura
-            parent = parent[atributos[i]].valor;
-            // Actualizar el tipo de estructura actual
-            currentType = atributo.tipo;
+            StructPadre = StructPadre[atributos[i]].valor;
+            StructTipo = atributo.tipo;
         }
-    
-        // Obtener el último atributo (el que vamos a asignar)
-        const lastAttr = atributos[atributos.length - 1];
-        // Obtener la definición de la estructura final
-        const finalStructDef = this.getStruct(currentType);
-        
-        // Verificar si existe la definición de la estructura final
+        const UltimoAtributo = atributos[atributos.length - 1];
+        const finalStructDef = this.getStruct(StructTipo);
         if (!finalStructDef) {
-            throw new Error(`Definición de estructura no encontrada para "${currentType}".`);
+            throw new Error(`Definición De Struct No Encontrada Para: "${StructTipo}".`);
         }
-    
-        // Verificar si el atributo final existe en la definición de la estructura
-        const finalAtributo = finalStructDef.atributos.find(attr => attr.id === lastAttr);
+        const finalAtributo = finalStructDef.atributos.find(attr => attr.id === UltimoAtributo);
         if (!finalAtributo) {
-            throw new Error(`El atributo "${lastAttr}" no está definido en la estructura "${currentType}".`);
+            throw new Error(`El atributo "${UltimoAtributo}" no está definido en la Struct "${StructTipo}".`);
         }
-    
-        // Validación de tipos
-        // Comparar el tipo del valor a asignar con el tipo esperado del atributo
         if (finalAtributo.tipo === "string" && valor.tipo !== "string") {
-            throw new Error(`El tipo del atributo "${lastAttr}" es "string". No coincide con el tipo del valor asignado.`);
+            throw new Error(`El tipo del atributo "${UltimoAtributo}" es "string". No coincide con el tipo del valor asignado.`);
         }
         if (finalAtributo.tipo === "int" && valor.tipo !== "int") {
-            throw new Error(`El tipo del atributo "${lastAttr}" es "int". No coincide con el tipo del valor asignado.`);
+            throw new Error(`El tipo del atributo "${UltimoAtributo}" es "int". No coincide con el tipo del valor asignado.`);
         }
-        // Caso especial: convertir int a float si es necesario
         if (finalAtributo.tipo === "float" && valor.tipo === "int") {
             valor.valor = parseFloat(valor.valor);
             valor.tipo = 'float';
         }
         if (finalAtributo.tipo === "float" && valor.tipo !== "float") {
-            throw new Error(`El tipo del atributo "${lastAttr}" es "float". No coincide con el tipo del valor asignado.`);
+            throw new Error(`El tipo del atributo "${UltimoAtributo}" es "float". No coincide con el tipo del valor asignado.`);
         }
         if (finalAtributo.tipo === "char" && valor.tipo !== "char") {
-            throw new Error(`El tipo del atributo "${lastAttr}" es "char". No coincide con el tipo del valor asignado.`);
+            throw new Error(`El tipo del atributo "${UltimoAtributo}" es "char". No coincide con el tipo del valor asignado.`);
         }
         if (finalAtributo.tipo === "boolean" && valor.tipo !== "boolean") {
-            throw new Error(`El tipo del atributo "${lastAttr}" es "boolean". No coincide con el tipo del valor asignado.`);
+            throw new Error(`El tipo del atributo "${UltimoAtributo}" es "boolean". No coincide con el tipo del valor asignado.`);
         }
-    
-        // Asignación del valor
-        // Si todas las validaciones pasan, asignar el nuevo valor al atributo
-        parent[lastAttr] = valor;
+        StructPadre[UltimoAtributo] = valor;
     }
 }
