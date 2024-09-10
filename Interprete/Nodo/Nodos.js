@@ -1031,8 +1031,9 @@ export class LengthArreglo extends Expresion {
     /**
     * @param {Object} options
     * @param {string} options.id Expresiones a unir
+ * @param {Expresion[]} options.posicion Expresiones a unir
     */
-    constructor({ id }) {
+    constructor({ id, posicion }) {
         super();
         
         /**
@@ -1040,6 +1041,13 @@ export class LengthArreglo extends Expresion {
          * @type {string}
         */
         this.id = id;
+
+
+        /**
+         * Expresiones a unir
+         * @type {Expresion[]}
+        */
+        this.posicion = posicion;
 
     }
 

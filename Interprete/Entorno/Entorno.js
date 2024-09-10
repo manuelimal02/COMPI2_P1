@@ -12,12 +12,14 @@ export class Entorno {
     /**
      * @param {string} nombre
      * @param {any} valor
+     * @param {string} linea
+     * @param {string} columna
      */
-    setVariable(tipo, nombre, valor) {
+    setVariable(tipo, nombre, valor, linea, columna) {
         if (this.valores[nombre]) {
             throw new Error(`La Variable: "${nombre}" Ya Está Definida.`);
         }
-        this.valores[nombre] = { valor, tipo};
+        this.valores[nombre] = { valor, tipo, linea, columna };
     }
 
     /**
@@ -161,20 +163,19 @@ export class Entorno {
         StructPadre[UltimoAtributo] = valor;
     }
 
+    
     RetornarEntorno() {
         let Simbolos = [];
         const agregarSimbolos = (entorno) => {
             for (const key in entorno.valores) {
-                if (Object.hasOwnProperty.call(entorno.valores, key)) {
                     const element = entorno.valores[key];
                     if (element.tipo === "funcion") {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa" });
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa", linea: 0, columna: 0 });
                     } else if (element.valor instanceof Foranea) {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea" });
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea", linea: element.linea, columna: element.columna });
                     } else {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor });
+                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor, linea: element.linea, columna: element.columna });
                     }
-                }
             }
         };
         agregarSimbolos(this);

@@ -140,7 +140,7 @@ PARAMETROS = primerParametro:PARAMETRO restoParametros:("," _ parametro:PARAMETR
 PARAMETRO = tipo:TIPO dimensiones:ARREGLODIMENSION? _ id:IDENTIFICADOR
             { return { tipo, id, dim: dimensiones || "" }; }
 
-ARREGLODIMENSION = "[" _ "]"+  { return text(); }
+ARREGLODIMENSION = ("[" _ "]")*  { return text(); }
 
 
 ARREGLO = tipo:TIPO _ "[]" _ id:IDENTIFICADOR _ "=" _ valores:VALORES _ ";" 
@@ -155,8 +155,6 @@ VALORES = "{" _ valores:LISTAVALORES _ "}"
 
 LISTAVALORES = expresion1:EXPRESION _ valores:("," _ expresion:EXPRESION {return expresion})* 
             {return [expresion1, ...valores]}
-
-
 
 IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA 
             sentenciasFalso:(
@@ -192,12 +190,10 @@ FOR = _ "for" _ "("_ declaracion:FORINIT _ condicion:EXPRESION _ ";" _ increment
 FOREACH = _ "for" _ "(" _ tipo: TIPO _ id:IDENTIFICADOR _ ":" _ arreglo: IDENTIFICADOR _ ")" _ sentencias:SENTENCIA 
             {return NuevoNodo('ForEach', {tipo, id, arreglo, sentencias})}
 
-FORINIT = declaracion:DECLARACION 
+FORINIT = asignacion:ASIGNACION
+            {return asignacion}
+            /declaracion:DECLARACION 
             {return declaracion}
-            / expresion:EXPRESION _ ";" _
-            {return expresion}
-            / ";" _
-            {return null}
 
 BREAK = _ "break" _ ";" _ 
             {return NuevoNodo('Break')}
@@ -360,9 +356,9 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('OperacionUnaria', {operador: '-', expresion: expresion})}
         / "!" _ expresion:UNARIA 
             {return NuevoNodo('OperacionUnaria', {operador: '!', expresion: expresion})}
-        / embe:("typeof") _ expresion:OTRAEXPRESION 
+        / embe:("typeof") _ expresion:EXPRESION 
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
-        / embe:("toString")"(" _ expresion:OTRAEXPRESION _ ")" _
+        / embe:("toString")"(" _ expresion:EXPRESION _ ")" _
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
         / embe:("Object.keys")"(" _ expresion:IDENTIFICADOR _ ")" _
             {return NuevoNodo('Embebida', {Nombre: embe, Argumento: expresion})}
@@ -370,8 +366,8 @@ UNARIA = "-" _ expresion:UNARIA
             {return NuevoNodo('IndexArreglo', {id, index})}
         / id:IDENTIFICADOR _ ".join()"
             {return NuevoNodo('JoinArreglo', {id})}
-        / id:IDENTIFICADOR _ ".length"
-            {return NuevoNodo('LengthArreglo', {id})}
+        / id:IDENTIFICADOR _ posicion:VALORESLENGTH _".length"
+            {return NuevoNodo('LengthArreglo', {id, posicion})}
         / id:IDENTIFICADOR _ valores:VALORESMATRIZ
             {return NuevoNodo('AccesoMatriz', {id, valores})}
         / id:IDENTIFICADOR _ "[" _ index:OTRAEXPRESION _ "]"
@@ -379,6 +375,9 @@ UNARIA = "-" _ expresion:UNARIA
         / ACCESONATRIBUTO
         / LLAMADA
         / OTRAEXPRESION
+
+VALORESLENGTH = ("[" _ posicion:EXPRESION _ "]" 
+            {return posicion})* 
 
 LLAMADA = callee:OTRAEXPRESION _ parametros:("(" argumentos:ARGUMENTOS? ")" { return argumentos })* {
     return parametros.reduce(
@@ -409,6 +408,7 @@ OTRAEXPRESION = decimal:DECIMAL
             {return caracter}
             / cadena:CADENA
             {return cadena}
+            
 
 
 TIPO = "int" 

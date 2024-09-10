@@ -50,11 +50,11 @@ export class DeclaracionVariableHandler {
         const entorno = this.entornoActual;
         if (tipoInferido === 'float' && valor.tipo === 'int' || tipoInferido === 'float' && valor.tipo === 'float') {
             valor.tipo = 'float';
-            entorno.setVariable(tipoInferido, this.nombre, valor);
+            entorno.setVariable(tipoInferido, this.nombre, valor, this.linea, this.columna);
             return;
         }
         if (tipoInferido === valor.tipo) {
-            entorno.setVariable(tipoInferido, this.nombre, valor);
+            entorno.setVariable(tipoInferido, this.nombre, valor, this.linea, this.columna);
         } else {
             throw new Error(`La Variable: "${this.nombre}" Debe Ser Tipo: "${tipoInferido}".`);
         }

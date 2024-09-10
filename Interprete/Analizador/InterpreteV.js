@@ -107,12 +107,11 @@ export class Interprete extends BaseVisitor {
             if (this.entornoActual.getVariable(node.id)) {
                 throw new Error(`El id ${node.id} no es un struct`)
             }
-            this.entornoActual.setVariable(tipo, node.id, expresion)
+            this.entornoActual.setVariable(tipo, node.id, expresion, node.location.start.line, node.location.start.column)
             return
         }
-        console.log("Linea", node.location.start.line)
-        console.log("Columna",node.location.start.column)
-        const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, this);
+        const DeclaracionHandler = new DeclaracionVariableHandler(node.tipo, node.id, node.expresion, this.entornoActual, 
+            node.location.start.line, node.location.start.column, this);
         DeclaracionHandler.EjecutarHandler();
         console.log(this.entornoActual)
     }
@@ -329,6 +328,9 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitLlamada']}
      */
     visitLlamada(node) {
+        console.log("ENTRA A LLAMADA")
+        console.log(node)
+        console.log("---------")
         const funcion = node.callee.accept(this);
         const argumentos = node.argumentos.map(arg => arg.accept(this));
         if (!(funcion instanceof Invocable)) {
@@ -338,7 +340,6 @@ export class Interprete extends BaseVisitor {
             throw new Error(`La función: "${node.callee.id}" espera ${funcion.aridad()} argumentos, pero se recibieron ${argumentos.length}.`);
         }
         if (funcion.aridad() > 0 && funcion.node) {
-            console.log(funcion.node)
             funcion.node.parametros.forEach((param, i) => {
                 const argumento = argumentos[i];
                 if (param.tipo !== argumento.tipo) {
@@ -416,7 +417,7 @@ export class Interprete extends BaseVisitor {
             }
             arreglo.push(valor.valor);
         }
-        this.entornoActual.setVariable(node.tipo, node.id, {valor: arreglo, tipo: node.tipo});
+        this.entornoActual.setVariable(node.tipo, node.id, {valor: arreglo, tipo: node.tipo}, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 
@@ -455,7 +456,7 @@ export class Interprete extends BaseVisitor {
             default:
                 throw new Error(`Tipo De Arreglo No Válido: "${node.tipo1}".`);
         }
-        this.entornoActual.setVariable(node.tipo1, node.id, {valor: arreglo, tipo: node.tipo});
+        this.entornoActual.setVariable(node.tipo1, node.id, {valor: arreglo, tipo: node.tipo1}, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 
@@ -470,7 +471,7 @@ export class Interprete extends BaseVisitor {
         if (valores.tipo !== node.tipo) {
             throw new Error(`El Tipo Del Arreglo "${valores.tipo}" No Coincide Con El Tipo Del Arreglo "${node.tipo}".`);
         }
-        this.entornoActual.setVariable(node.tipo, node.id1, {valor: valores.valor.slice(), tipo: node.tipo});
+        this.entornoActual.setVariable(node.tipo, node.id1, {valor: valores.valor.slice(), tipo: node.tipo}, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 
@@ -516,12 +517,49 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitLengthArreglo']}
      */
     visitLengthArreglo(node) {
-        const arreglo = this.entornoActual.getVariable(node.id).valor;
-        if (!Array.isArray(arreglo.valor)) {
-            throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+        // Si no hay posición (queremos la longitud total del arreglo de la primera dimensión)
+        if (node.posicion.length === 0) {
+            const arreglo = this.entornoActual.getVariable(node.id).valor;
+            if (!Array.isArray(arreglo.valor)) {
+                throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+            }
+            return {valor: arreglo.valor.length, tipo: "int"};
+        } else {
+            // Si hay posiciones, navegamos por cada una
+            const arreglo = this.entornoActual.getVariable(node.id).valor;
+            if (!Array.isArray(arreglo.valor)) {
+                throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
+            }
+    
+            let ref = arreglo.valor;
+    
+            // Recorremos las posiciones para navegar en las dimensiones del arreglo
+            for (let i = 0; i < node.posicion.length; i++) {
+                const numero = node.posicion[i].accept(this);
+    
+                if (numero.tipo !== 'int') {
+                    throw new Error(`El Índice De Acceso "${i + 1}" Debe Ser De Tipo Int: "${numero.tipo}".`);
+                }
+                if (!Array.isArray(ref)) {
+                    throw new Error(`La Referencia En La Dimensión "${i + 1}" No Es Un Arreglo.`);
+                }
+                if (numero.valor < 0 || numero.valor >= ref.length) {
+                    throw new Error(`Índice Fuera De Rango: "${numero.valor}" En Dimensión "${i + 1}".`);
+                }
+    
+                // Actualizamos la referencia al siguiente nivel del arreglo
+                ref = ref[numero.valor];
+            }
+    
+            // Después de recorrer las posiciones, verificamos si ref aún es un arreglo
+            if (!Array.isArray(ref)) {
+                throw new Error(`La Referencia Final No Es Un Arreglo, No Se Puede Obtener Su Longitud.`);
+            }
+    
+            return {valor: ref.length, tipo: "int"};
         }
-        return {valor: arreglo.valor.length, tipo: "int"};
     }
+    
     
     /**
      * @type {BaseVisitor['visitAccesoArreglo']}
@@ -550,6 +588,7 @@ export class Interprete extends BaseVisitor {
         const arreglo = this.entornoActual.getVariable(node.id).valor;
         const index = node.index.accept(this);
         const valor = node.valor.accept(this);
+        console.log(arreglo)
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
         }
@@ -586,7 +625,7 @@ export class Interprete extends BaseVisitor {
             return Matriz;
         };
         const NuevaMatriz = RecorrerMatriz(node.valores, node.tipo);
-        this.entornoActual.setVariable(node.tipo, node.id, {valor: NuevaMatriz, tipo: node.tipo});
+        this.entornoActual.setVariable(node.tipo, node.id, {valor: NuevaMatriz, tipo: node.tipo}, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 
@@ -643,7 +682,7 @@ export class Interprete extends BaseVisitor {
                 throw new Error(`Tipo De Matriz No Válido: "${node.tipo1}".`);
         }
         const NuevaMatriz = crearMatriz(node.valores, node.tipo1, ValorPorDefecto);
-        this.entornoActual.setVariable(node.tipo1, node.id, {valor: NuevaMatriz, tipo: node.tipo1});
+        this.entornoActual.setVariable(node.tipo1, node.id, {valor: NuevaMatriz, tipo: node.tipo1}, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 
@@ -706,6 +745,7 @@ export class Interprete extends BaseVisitor {
             }
             ref = ref[numero.valor];
         });
+        console.log("ENTRA A ACCESO MATRIZ")
         return { valor: ref, tipo: matriz.tipo };
     }
 
@@ -762,7 +802,7 @@ export class Interprete extends BaseVisitor {
             throw new Error(`Los parámetros de la función "${node.id}" no deben tener el mismo nombre.`);
         }
         const funcion = new Foranea(node, this.entornoActual);
-        this.entornoActual.setVariable(node.tipo, node.id, funcion);
+        this.entornoActual.setVariable(node.tipo, node.id, funcion, node.location.start.line, node.location.start.column);
         console.log(this.entornoActual)
     }
 

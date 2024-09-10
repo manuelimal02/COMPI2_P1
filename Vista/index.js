@@ -121,6 +121,8 @@ export function FuncionArchivo() {
                         <th>Nombre</th>
                         <th>Tipo</th>
                         <th>Valor</th>
+                        <th>Fila</th>
+                        <th>Columna</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -131,6 +133,8 @@ export function FuncionArchivo() {
                 <td>${simbolo.nombre}</td>
                 <td>${simbolo.tipo}</td>
                 <td>${simbolo.valor}</td>
+                <td>${simbolo.linea}</td>
+                <td>${simbolo.columna}</td>
             </tr>
             `;
         });
@@ -141,13 +145,11 @@ export function FuncionArchivo() {
         </body>
         </html>
         `;
-    
-        // Crear un Blob con el contenido HTML
         const blob = new Blob([contenidoHTML], { type: 'text/html' });
         const enlace = document.createElement('a');
         enlace.href = URL.createObjectURL(blob);
-        enlace.download = "TablaDeSimbolos.html"; // Nombre del archivo
-        enlace.click(); // Descargar archivo
+        enlace.download = "TablaDeSimbolos.html";
+        enlace.click(); 
     }
     
 
