@@ -328,9 +328,6 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitLlamada']}
      */
     visitLlamada(node) {
-        console.log("ENTRA A LLAMADA")
-        console.log(node)
-        console.log("---------")
         const funcion = node.callee.accept(this);
         const argumentos = node.argumentos.map(arg => arg.accept(this));
         if (!(funcion instanceof Invocable)) {
@@ -588,7 +585,6 @@ export class Interprete extends BaseVisitor {
         const arreglo = this.entornoActual.getVariable(node.id).valor;
         const index = node.index.accept(this);
         const valor = node.valor.accept(this);
-        console.log(arreglo)
         if (!Array.isArray(arreglo.valor)) {
             throw new Error(`La Variable: "${node.id}" No Es Un Arreglo.`);
         }
@@ -745,7 +741,6 @@ export class Interprete extends BaseVisitor {
             }
             ref = ref[numero.valor];
         });
-        console.log("ENTRA A ACCESO MATRIZ")
         return { valor: ref, tipo: matriz.tipo };
     }
 

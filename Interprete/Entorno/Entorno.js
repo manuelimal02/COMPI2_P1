@@ -72,7 +72,6 @@ export class Entorno {
         throw new Error(`La Variable "${nombre}" No Está Definida.`);
     }
 
-    //Manejo De Temporales Para ForEach
     /**
      * @param {string} nombre
      */
@@ -83,7 +82,6 @@ export class Entorno {
         this.valores[nombre] = {valor, tipo}
     }
 
-    //Manejo De Structs
     setStruct(nombre, atributos) {
         if(this.valores[nombre]) {
             throw new Error(`La Variable: "${nombre}" Ya Está Declarada.`)
@@ -162,26 +160,42 @@ export class Entorno {
         }
         StructPadre[UltimoAtributo] = valor;
     }
-
     
     RetornarEntorno() {
         let Simbolos = [];
+        const convertirStructAString = (struct) => {
+            let resultado = '';
+            for (const key in struct) {
+                const prop = struct[key];
+                if (typeof prop.valor === 'object' && prop.valor !== null && !Array.isArray(prop.valor)) {
+                    resultado += `${key}: {\n${convertirStructAString(prop.valor)}\n}, `;
+                } else {
+                    resultado += `${key}: ${prop.valor}, `;
+                }
+            }
+            resultado = resultado.slice(0, -2);
+            return resultado;
+        };
         const agregarSimbolos = (entorno) => {
             for (const key in entorno.valores) {
-                    const element = entorno.valores[key];
-                    if (element.tipo === "funcion") {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa", linea: 0, columna: 0 });
-                    } else if (element.valor instanceof Foranea) {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea", linea: element.linea, columna: element.columna });
-                    } else {
-                        Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor, linea: element.linea, columna: element.columna });
-                    }
+                const element = entorno.valores[key];
+                if (element.tipo === "funcion") {
+                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa", linea: 0, columna: 0 });
+                } else if (element.valor instanceof Foranea) {
+                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea", linea: element.linea, columna: element.columna });
+                } else if (this.getStruct(element.tipo)) {
+                    const structString = convertirStructAString(element.valor.valor);
+                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: structString, linea: element.linea, columna: element.columna });
+                } else {
+                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor, linea: element.linea, columna: element.columna });
+                }
             }
         };
         agregarSimbolos(this);
         let entornoPadre = this.padre;
         while (entornoPadre) {
             agregarSimbolos(entornoPadre);
+            entornoPadre = entornoPadre.padre;
         }
         return Simbolos;
     }

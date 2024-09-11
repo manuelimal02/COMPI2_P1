@@ -1,5 +1,6 @@
 let UltimoAST = null;
 let TablaDeSimbolosGeneral = [];
+let ListaErrores = []; 
 import { parse } from '../Interprete/Analizador/Parser.js';
 import { Interprete } from '../Interprete/Analizador/InterpreteV.js';
 
@@ -11,6 +12,7 @@ export function FuncionArchivo() {
     const CrearArchivo = document.getElementById('CrearArchivo');
     const GuardarArchivo = document.getElementById('GuardarArchivo');
     const TablaSimbolos = document.getElementById('TablaSimbolos');
+    const TablaErrores = document.getElementById('TablaErrores');
 
     function FuncionAbrirArchivo(evento) {
         const archivo = evento.target.files[0];
@@ -123,6 +125,7 @@ export function FuncionArchivo() {
                         <th>Valor</th>
                         <th>Fila</th>
                         <th>Columna</th>
+                        <th>Ambito</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,6 +138,7 @@ export function FuncionArchivo() {
                 <td>${simbolo.valor}</td>
                 <td>${simbolo.linea}</td>
                 <td>${simbolo.columna}</td>
+                <td>${simbolo.ambito}</td>
             </tr>
             `;
         });
@@ -151,11 +155,82 @@ export function FuncionArchivo() {
         enlace.download = "TablaDeSimbolos.html";
         enlace.click(); 
     }
-    
 
-    AbrirArchivo.addEventListener('click', () => {
-        fileInput.click();
-    });
+    function TablaDeErroresHTML() {
+        if (ListaErrores.length === 0) {
+            alert('No Hay Errores Para Mostrar.');
+            return;
+        }
+        let contenidoHTML = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Reporte de Errores</title>
+            <style>
+                body {
+                    font-family: 'Courier New', Courier, monospace;
+                    text-align: center;
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    background-color: #f0f0f0;
+                    padding: 20px;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f2f2f2;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Reporte de Errores</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Descripción</th>
+                        <th>Linea</th>
+                        <th>Columna</th>
+                        <th>Ambito</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        ListaErrores.forEach((error, index) => {
+            contenidoHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${error.descripcion}</td>
+                <td>${error.linea}</td>
+                <td>${error.columna}</td>
+                <td>Global</td>
+            </tr>
+            `;
+        });
+        contenidoHTML += `
+            </tbody>
+            </table>
+        <h3>Carlos Manuel Lima y Lima - 202201524 - Reporte de Errores - Proyecto 1 - OLC2</h3>
+        </body>
+        </html>
+        `;
+        const blob = new Blob([contenidoHTML], { type: 'text/html' });
+        const enlace = document.createElement('a');
+        enlace.href = URL.createObjectURL(blob);
+        enlace.download = "ReporteDeErrores.html";
+        enlace.click();
+    }
+
 
     fileInput.addEventListener('change', FuncionAbrirArchivo);
 
@@ -169,6 +244,10 @@ export function FuncionArchivo() {
 
     TablaSimbolos.addEventListener('click', () => {
         TablaSimbolosHTML();
+    });
+
+    TablaErrores.addEventListener('click', () => {
+        TablaDeErroresHTML();
     });
 }
 
@@ -202,36 +281,49 @@ export function FuncionInterprete() {
         const codigo = entrada.value;
         const interprete = new Interprete();
         let sentencias;
-        
+        ListaErrores = [];
+        TablaDeSimbolosGeneral = [];
+    
         try {
             sentencias = parse(codigo);
-            console.log({ sentencias });
         } catch (error) {
-            salida.innerHTML = "Error de sintaxis: " + error.message;
-            console.error("Error de sintaxis:", error);
+            if (error.location) {
+                ListaErrores.push({
+                    descripcion: error.message,
+                    linea: error.location.start.line,
+                    columna: error.location.start.column,
+                });
+            } else {
+                console.error("Error inesperado:", error);
+            }
             return;
         }
-    
         sentencias.forEach(sentencia => {
             try {
                 sentencia.accept(interprete);
             } catch (error) {
-                // Aquí se captura el error de la sentencia específica
-                interprete.salida += "Error: " + error.message + '\n';
-                console.error("Error:", error);
+                const { line: linea, column: columna } = sentencia.location.start;
+                ListaErrores.push({
+                    descripcion: error.message,
+                    linea: linea,
+                    columna: columna,
+                });
+                console.error("Error En La Línea: " + linea + ", Columna: " + columna + ":", error);
             }
         });
-    
+        
         salida.value = interprete.salida;
         ActualizarNumeroLinea(salida, LNSalida);
         TablaDeSimbolosGeneral = interprete.entornoActual.RetornarEntorno();
     }
     
+    
+    
+        
     entrada.addEventListener('input', manejarEntrada);
     entrada.addEventListener('scroll', () => sincronizarScroll(entrada, LNEntrada));
     salida.addEventListener('scroll', () => sincronizarScroll(salida, LNSalida));
     BtnEjecutar.addEventListener('click', ejecutarCodigo);
-
     manejarEntrada();
 }
 
