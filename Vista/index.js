@@ -232,6 +232,10 @@ export function FuncionArchivo() {
     }
 
 
+    AbrirArchivo.addEventListener('click', () => {
+        fileInput.click();
+    });
+
     fileInput.addEventListener('change', FuncionAbrirArchivo);
 
     CrearArchivo.addEventListener('click', () => {
@@ -287,39 +291,37 @@ export function FuncionInterprete() {
         try {
             sentencias = parse(codigo);
         } catch (error) {
-            if (error.location) {
-                ListaErrores.push({
-                    descripcion: error.message,
-                    linea: error.location.start.line,
-                    columna: error.location.start.column,
-                });
-            } else {
-                console.error("Error inesperado:", error);
-            }
+            console.log("-----------------------");
+            console.log(error);
+            console.log("-----------------------");
+            const { line: linea, column: columna } = error.location.start;
+            ListaErrores.push({
+                descripcion: error.message,
+                linea: linea,
+                columna: columna,
+            });
             return;
         }
         sentencias.forEach(sentencia => {
             try {
                 sentencia.accept(interprete);
             } catch (error) {
+                console.log("-----------------------");
+                console.log(error);
+                console.log("-----------------------");
                 const { line: linea, column: columna } = sentencia.location.start;
                 ListaErrores.push({
                     descripcion: error.message,
                     linea: linea,
                     columna: columna,
                 });
-                console.error("Error En La Línea: " + linea + ", Columna: " + columna + ":", error);
             }
         });
-        
         salida.value = interprete.salida;
         ActualizarNumeroLinea(salida, LNSalida);
         TablaDeSimbolosGeneral = interprete.entornoActual.RetornarEntorno();
     }
-    
-    
-    
-        
+
     entrada.addEventListener('input', manejarEntrada);
     entrada.addEventListener('scroll', () => sincronizarScroll(entrada, LNEntrada));
     salida.addEventListener('scroll', () => sincronizarScroll(salida, LNSalida));
