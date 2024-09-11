@@ -13,6 +13,14 @@ import { Foranea } from "../Instruccion/Foranea.js";
 
 export class Interprete extends BaseVisitor {
 
+    static Reservadas = [
+        'int', 'float', 'string', 'boolean', 'char', 'var', 'null', 'true', 
+        'false', 'struct', 'if', 'else', 'switch', 'case', 'break', 
+        'default', 'while', 'for', 'continue', 'return', 'typeof', 'toString', 
+        'Object', 'indexOf', 'length', 'toUpperCase', 'toLowerCase', 'join', 'Object',
+        'paseInt', 'parsefloat'
+    ];
+
     constructor() {
         super();
         this.entornoActual = new Entorno();
@@ -95,6 +103,10 @@ export class Interprete extends BaseVisitor {
     * @type {BaseVisitor['visitDeclaracionVar']}
     */
     visitDeclaracionVar(node) {
+        const nombre = node.id;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         if (node.expresion instanceof Nodos.AsignacionStruct) {
             let tipo = node.tipo
             const expresion = node.expresion.accept(this)
@@ -406,6 +418,10 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionArreglo1']}
      */ 
     visitDeclaracionArreglo1(node) {
+        const nombre = node.id;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         let arreglo = [];
         const valoresEvaluados = node.valores.map(valor => valor.accept(this));
         for (let valor of valoresEvaluados) {
@@ -422,6 +438,10 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionArreglo2']}
      */ 
     visitDeclaracionArreglo2(node) {
+        const nombre = node.id;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         const numero = node.numero.accept(this);
         let arreglo = [];
         if (node.tipo1 !== node.tipo2) {
@@ -461,6 +481,10 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionArreglo3']}
      */ 
     visitDeclaracionArreglo3(node) {
+        const nombre = node.id1;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         const valores = this.entornoActual.getVariable(node.id2).valor;
         if (!valores) {
             throw new Error(`El Arreglo "${node.id2}" No Está Definido.`);
@@ -615,6 +639,10 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionMatriz1']}
      */
     visitDeclaracionMatriz1(node) {
+        const nombre = node.id;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         const RecorrerMatriz = (valores, tipo) => {
             const Matriz = [];
             for (let valor of valores) {
@@ -639,6 +667,10 @@ export class Interprete extends BaseVisitor {
      * @type {BaseVisitor['visitDeclaracionMatriz2']}
      */
     visitDeclaracionMatriz2(node) {
+        const nombre = node.id;
+        if (Interprete.Reservadas.includes(nombre)) {
+            throw new Error(`El ID: "${nombre}" Es Una Palabra Reservada. No Puede Ser Utilizada Como Nombre De Variable.`);
+        }
         if (node.tipo1 !== node.tipo2) {
             throw new Error(`El Tipo De La Matriz "${node.tipo1}" No Coincide Con El Tipo Del La Matriz "${node.tipo2}".`);
         }

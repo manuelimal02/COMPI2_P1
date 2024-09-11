@@ -1783,6 +1783,9 @@ return expansion.reduce(
 
     s0 = peg$currPos;
     s1 = peg$parseTIPO();
+    if (s1 === peg$FAILED) {
+      s1 = peg$parseIDENTIFICADOR();
+    }
     if (s1 !== peg$FAILED) {
       s2 = peg$parseARREGLODIMENSION();
       s3 = peg$parse_();

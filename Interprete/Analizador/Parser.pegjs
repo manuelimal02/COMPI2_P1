@@ -137,7 +137,7 @@ FUNCIONFORRANEA = tipo:(TIPO/ "void") _ id:IDENTIFICADOR _ "(" _ parametros:PARA
 PARAMETROS = primerParametro:PARAMETRO restoParametros:("," _ parametro:PARAMETRO { return parametro; })* 
             { return [primerParametro, ...restoParametros]; }
 
-PARAMETRO = tipo:TIPO dimensiones:ARREGLODIMENSION? _ id:IDENTIFICADOR
+PARAMETRO = tipo:(TIPO/IDENTIFICADOR) dimensiones:ARREGLODIMENSION? _ id:IDENTIFICADOR
             { return { tipo, id, dim: dimensiones || "" }; }
 
 ARREGLODIMENSION = ("[" _ "]")*  { return text(); }
