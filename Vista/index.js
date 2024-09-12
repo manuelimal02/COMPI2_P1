@@ -291,6 +291,7 @@ export function FuncionInterprete() {
         try {
             sentencias = parse(codigo);
         } catch (error) {
+            salida.innerHTML = "Error De Sintaxis: " + error.message;
             console.log("-----------------------");
             console.log(error);
             console.log("-----------------------");
@@ -306,6 +307,7 @@ export function FuncionInterprete() {
             try {
                 sentencia.accept(interprete);
             } catch (error) {
+                interprete.salida += "Error: " + error.message + '\n';
                 console.log("-----------------------");
                 console.log(error);
                 console.log("-----------------------");

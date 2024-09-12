@@ -162,7 +162,7 @@ IF = _ "if" _ "(" _ condicion:EXPRESION _ ")" _ sentenciasVerdadero:SENTENCIA
             { return sentenciasFalso } )? 
             { return NuevoNodo('If', { condicion, sentenciasVerdadero, sentenciasFalso }) }
 
-PRINT = _ "System.out.println(" _ expresion:EXPRESIONES _ ")" _ ";" _
+PRINT = _ ("System.out.println("/"print(") _ expresion:EXPRESIONES _ ")" _ ";" _
         {return NuevoNodo('Print', { expresion })}
 
 EXPRESIONES = primera:EXPRESION resto:(_ "," _ EXPRESION)* 
