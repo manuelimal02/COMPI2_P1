@@ -1,5 +1,7 @@
 import { Foranea } from "../Instruccion/Foranea.js";
+let Simbolos = [];
 export class Entorno {
+    
     /**
      * @param {Entorno} padre
      */
@@ -19,7 +21,8 @@ export class Entorno {
         if (this.valores[nombre]) {
             throw new Error(`La Variable: "${nombre}" Ya Está Definida.`);
         }
-        this.valores[nombre] = { valor, tipo, linea, columna };
+        Simbolos.push({tipo: tipo, nombre: nombre, valor: valor, fila: linea, columna: columna });
+        this.valores[nombre] = { valor, tipo, linea, columna }
     }
 
     /**
@@ -162,7 +165,7 @@ export class Entorno {
     }
     
     RetornarEntorno() {
-        let Simbolos = [];
+        let SimbolosConvertidos = [];
         const convertirStructAString = (struct) => {
             let resultado = '';
             for (const key in struct) {
@@ -176,28 +179,51 @@ export class Entorno {
             resultado = resultado.slice(0, -2);
             return resultado;
         };
-        const agregarSimbolos = (entorno) => {
-            for (const key in entorno.valores) {
-                const element = entorno.valores[key];
-                if (element.tipo === "funcion") {
-                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Nativa", linea: 0, columna: 0 });
-                } else if (element.valor instanceof Foranea) {
-                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: "Función Foránea", linea: element.linea, columna: element.columna });
-                } else if (this.getStruct(element.tipo)) {
-                    const structString = convertirStructAString(element.valor.valor);
-                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: structString, linea: element.linea, columna: element.columna });
-                } else {
-                    Simbolos.push({ nombre: key, tipo: element.tipo, valor: element.valor.valor, linea: element.linea, columna: element.columna });
-                }
+
+        for (let i = 0; i < Simbolos.length; i++) {
+            const simbolo = Simbolos[i];
+            if (simbolo.valor instanceof Foranea) {
+                SimbolosConvertidos.push({
+                    tipo: simbolo.tipo,
+                    simbolo: "Función",
+                    nombre: simbolo.nombre,
+                    valor: "Función Foránea",
+                    fila: simbolo.fila||'N/A',
+                    columna: simbolo.columna||'N/A'
+                });
+            } else if (this.getStruct(simbolo.tipo)) {
+                const structString = convertirStructAString(simbolo.valor.valor);
+                SimbolosConvertidos.push({
+                    tipo: simbolo.tipo,
+                    simbolo: "Struct",
+                    nombre: simbolo.nombre,
+                    valor: structString,
+                    fila: simbolo.fila||'N/A',
+                    columna: simbolo.columna||'N/A'
+                });
+            } else if (Array.isArray(simbolo.valor.valor)) {
+                SimbolosConvertidos.push({
+                    tipo: simbolo.tipo,
+                    simbolo: "Array",
+                    nombre: simbolo.nombre,
+                    valor: simbolo.valor.valor,
+                    fila: simbolo.fila||'N/A',
+                    columna: simbolo.columna||'N/A'
+                });
             }
-        };
-        agregarSimbolos(this);
-        let entornoPadre = this.padre;
-        while (entornoPadre) {
-            agregarSimbolos(entornoPadre);
-            entornoPadre = entornoPadre.padre;
+            else if (simbolo.tipo !== "funcion") {
+                SimbolosConvertidos.push({
+                    tipo: simbolo.tipo,
+                    simbolo: "Variable",
+                    nombre: simbolo.nombre,
+                    valor: simbolo.valor.valor,
+                    fila: simbolo.fila||'N/A',
+                    columna: simbolo.columna||'N/A'
+                }
+                );
+            }
         }
-        return Simbolos;
+        return SimbolosConvertidos;
     }
     
 }

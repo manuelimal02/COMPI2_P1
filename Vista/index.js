@@ -125,7 +125,7 @@ export function FuncionArchivo() {
                         <th>Valor</th>
                         <th>Fila</th>
                         <th>Columna</th>
-                        <th>Ambito</th>
+                        <th>Tipo Simbolo</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -136,9 +136,9 @@ export function FuncionArchivo() {
                 <td>${simbolo.nombre}</td>
                 <td>${simbolo.tipo}</td>
                 <td>${simbolo.valor}</td>
-                <td>${simbolo.linea}</td>
+                <td>${simbolo.fila}</td>
                 <td>${simbolo.columna}</td>
-                <td>${simbolo.ambito}</td>
+                <td>${simbolo.simbolo}</td>
             </tr>
             `;
         });
