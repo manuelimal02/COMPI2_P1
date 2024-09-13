@@ -30,7 +30,10 @@ export class DeclaracionVariableHandler {
         const tipo = valor.tipo;
         if (tipo === 'int' || tipo === 'float' || tipo === 'char' || tipo === 'string' || tipo === 'bool') {
             return tipo;
-        } else {
+        } else if (this.entornoActual.getStruct(tipo)) {
+            return tipo;
+        }
+        else {
             throw new Error(`No Se Puede Determinar El Tipo De Dato De: "${this.nombre}".`);
         }
     }

@@ -423,6 +423,7 @@ TIPO = "int"
             {return text()}
             / "var"
             {return text()}
+            / IDENTIFICADOR
 
 IDENTIFICADOR = [a-zA-Z_][a-zA-Z0-9_]* 
             { return text(); }
