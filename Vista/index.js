@@ -3,6 +3,7 @@ let TablaDeSimbolosGeneral = [];
 let ListaErrores = []; 
 import { parse } from '../Interprete/Analizador/Parser.js';
 import { Interprete } from '../Interprete/Analizador/InterpreteV.js';
+import  ErrorManager  from '../Interprete/Errores/Errores.js';
 
 export function FuncionArchivo() {
     const entrada = document.getElementById('txtAreaEntrada');
@@ -157,7 +158,7 @@ export function FuncionArchivo() {
     }
 
     function TablaDeErroresHTML() {
-        if (ListaErrores.length === 0) {
+        if (ListaErrores.length === 0 && ErrorManager.ObtenerErrors().length === 0) {
             alert('No Hay Errores Para Mostrar.');
             return;
         }
@@ -207,6 +208,17 @@ export function FuncionArchivo() {
                 <tbody>
         `;
         ListaErrores.forEach((error, index) => {
+            contenidoHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${error.descripcion}</td>
+                <td>${error.linea}</td>
+                <td>${error.columna}</td>
+                <td>Global</td>
+            </tr>
+            `;
+        });
+        ErrorManager.ObtenerErrors().forEach((error, index) => {
             contenidoHTML += `
             <tr>
                 <td>${index + 1}</td>
@@ -287,7 +299,8 @@ export function FuncionInterprete() {
         let sentencias;
         ListaErrores = [];
         TablaDeSimbolosGeneral = [];
-    
+        ErrorManager.LimpiarErrors();
+        interprete.entornoActual.LimpiarTabla();
         try {
             sentencias = parse(codigo);
         } catch (error) {
